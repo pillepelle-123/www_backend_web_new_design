@@ -63,6 +63,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/{id}/mark-successful', [UserMatchController::class, 'markSuccessful'])->name('mark-successful');
         Route::post('/{id}/dissolve', [UserMatchController::class, 'dissolve'])->name('dissolve');
         Route::post('/{id}/archive', [UserMatchController::class, 'archive'])->name('archive');
+        Route::post('/{id}/unarchive', [UserMatchController::class, 'unarchive'])->name('unarchive');
         Route::post('/{id}/report', [UserMatchController::class, 'report'])->name('report');
     });
 

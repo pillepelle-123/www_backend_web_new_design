@@ -84,7 +84,7 @@ class UserMatchController extends Controller
             ];
         });
 
-        return Inertia::render('user-matches/index', [
+        return Inertia::render('user-matches/modern-index', [
             'userMatches' => $userMatches,
         ]);
     }
@@ -260,6 +260,33 @@ class UserMatchController extends Controller
             ->with('success', 'Match archiviert.');
     }
 
+    public function unarchive($id)
+    {
+        $userMatch = UserMatch::findOrFail($id);
+        $user = Auth::user();
+        $application = $userMatch->application;
+        $offer = $application->offer;
+
+        // Prüfe Berechtigung
+        if ($user->id !== $application->applicant_id &&
+            $user->id !== $offer->offerer_id) {
+            abort(403, 'Unbefugter Zugriff.');
+        }
+
+        // Bestimme ob User Applicant oder Offerer ist
+        $isApplicant = $application->applicant_id === $user->id;
+
+        // Entferne entsprechendes Archivierungsfeld
+        if ($isApplicant) {
+            $userMatch->update(['is_archived_by_applicant' => false]);
+        } else {
+            $userMatch->update(['is_archived_by_offerer' => false]);
+        }
+
+        return redirect()->route('web.user-matches.index')
+            ->with('success', 'Match wiederhergestellt.');
+    }
+
     public function report($id)
     {
         // Placeholder für Melden-Funktionalität
@@ -275,20 +302,20 @@ class UserMatchController extends Controller
     private function getPartnerMatchAction($userMatch, $isApplicant)
     {
         $isArchivedByPartner = $isApplicant ? $userMatch->is_archived_by_offerer : $userMatch->is_archived_by_applicant;
-        
+
         if ($isArchivedByPartner) {
             return 'Ihr Partner hat den Match archiviert';
         }
-        
+
         // Prüfe Application-Aktionen
         $application = $userMatch->application;
         $applicationAction = $this->getPartnerApplicationAction($application, $isApplicant);
         if ($applicationAction) {
             return $applicationAction;
         }
-        
+
         $partnerSuccessStatus = $isApplicant ? $userMatch->success_status_offerer : $userMatch->success_status_applicant;
-        
+
         switch ($partnerSuccessStatus) {
             case 'successful':
                 return 'Ihr Partner hat den Match als erfolgreich markiert';
@@ -306,11 +333,11 @@ class UserMatchController extends Controller
     {
         $status = $application->status;
         $isArchivedByPartner = $isApplicant ? $application->is_archived_by_offerer : $application->is_archived_by_applicant;
-        
+
         if ($isArchivedByPartner) {
             return 'Ihr Partner hat die Application archiviert';
         }
-        
+
         switch ($status) {
             case 'approved':
                 return $isApplicant ? 'Ihr Partner hat die Application genehmigt' : null;
@@ -322,18 +349,18 @@ class UserMatchController extends Controller
                 return null;
         }
     }
-    
+
     /**
      * Get user's rating ID if exists
      */
     private function getUserRatingId($userMatch, $isApplicant)
     {
         $direction = $isApplicant ? 'applicant_to_offerer' : 'offerer_to_applicant';
-        
+
         $rating = \App\Models\Rating::where('user_match_id', $userMatch->id)
             ->where('direction', $direction)
             ->first();
-            
+
         return $rating ? $rating->id : null;
     }
 }

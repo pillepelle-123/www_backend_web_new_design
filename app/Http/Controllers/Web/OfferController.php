@@ -99,7 +99,7 @@ class OfferController extends Controller
             ];
         });
 
-        return Inertia::render('offers/index', [
+        return Inertia::render('offers/modern-index', [
             'offers' => $offersData,
             'pagination' => [
                 'current_page' => $offers->currentPage(),

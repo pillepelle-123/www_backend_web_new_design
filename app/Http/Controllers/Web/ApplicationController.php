@@ -72,7 +72,7 @@ class ApplicationController extends Controller
         // Zähle ungelesene Nachrichten
         $unreadCount = $applications->where('is_unread', true)->count();
 
-        return Inertia::render('applications/index', [
+        return Inertia::render('applications/modern-index', [
             'applications' => $applications,
             'unreadCount' => $unreadCount,
         ]);
@@ -499,7 +499,7 @@ class ApplicationController extends Controller
         if ($userMatch) {
             $isApplicant = $user->id === $application->applicant_id;
             $userSuccessStatus = $isApplicant ? $userMatch->success_status_applicant : $userMatch->success_status_offerer;
-            
+
             if ($userSuccessStatus === 'pending' || $userSuccessStatus === 'successful') {
                 $hasActiveMatch = true;
                 $matchStatus = $userSuccessStatus;
@@ -583,14 +583,14 @@ class ApplicationController extends Controller
         }
 
         $isApplicant = $user->id === $application->applicant_id;
-        
+
         if ($isApplicant) {
             $application->update([
                 'status' => 'retracted',
                 'responded_at' => now(),
                 'is_archived_by_applicant' => true,
             ]);
-            
+
             $userMatch = UserMatch::where('application_id', $application->id)->first();
             if ($userMatch) {
                 $userMatch->update([
@@ -604,7 +604,7 @@ class ApplicationController extends Controller
                 'responded_at' => now(),
                 'is_archived_by_offerer' => true,
             ]);
-            
+
             $userMatch = UserMatch::where('application_id', $application->id)->first();
             if ($userMatch) {
                 $userMatch->update([
@@ -625,11 +625,11 @@ class ApplicationController extends Controller
     {
         $status = $application->status;
         $isArchivedByPartner = $isApplicant ? $application->is_archived_by_offerer : $application->is_archived_by_applicant;
-        
+
         if ($isArchivedByPartner) {
             return 'Ihr Partner hat die Application archiviert';
         }
-        
+
         // Prüfe UserMatch-Aktionen
         $userMatch = UserMatch::where('application_id', $application->id)->first();
         if ($userMatch) {
@@ -638,7 +638,7 @@ class ApplicationController extends Controller
                 return $partnerMatchAction;
             }
         }
-        
+
         switch ($status) {
             case 'approved':
                 return $isApplicant ? 'Ihr Partner hat die Application genehmigt' : null;
@@ -657,13 +657,13 @@ class ApplicationController extends Controller
     private function getPartnerMatchAction($userMatch, $isApplicant)
     {
         $isArchivedByPartner = $isApplicant ? $userMatch->is_archived_by_offerer : $userMatch->is_archived_by_applicant;
-        
+
         if ($isArchivedByPartner) {
             return 'Ihr Partner hat den Match archiviert';
         }
-        
+
         $partnerSuccessStatus = $isApplicant ? $userMatch->success_status_offerer : $userMatch->success_status_applicant;
-        
+
         switch ($partnerSuccessStatus) {
             case 'successful':
                 return 'Ihr Partner hat den Match als erfolgreich markiert';

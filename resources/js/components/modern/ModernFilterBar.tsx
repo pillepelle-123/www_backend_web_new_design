@@ -279,14 +279,25 @@ export function ModernFilterBar({
           <Filter className="w-5 h-5" />
           Filter & Sortierung
         </h3>
-        {hasActiveFilters() && (
-          <button
-            onClick={clearFilters}
-            className="md-button md-button--text"
-          >
-            Zurücksetzen
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {hasActiveFilters() && (
+            <button
+              onClick={clearFilters}
+              className="md-button md-button--text"
+            >
+              Zurücksetzen
+            </button>
+          )}
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="p-2 rounded-lg hover:bg-[var(--md-surface-container-high)] transition-colors"
+              aria-label="Filter schließen"
+            >
+              <X className="w-5 h-5 text-[var(--md-on-surface-variant)]" />
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

@@ -5,8 +5,7 @@ import { Head } from '@inertiajs/react';
 import { ModernOfferCard } from '@/components/modern/ModernOfferCard';
 import { ModernFilterBar } from '@/components/modern/ModernFilterBar';
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Filter, Search } from "lucide-react";
-import { useOffers } from '@/hooks/use-offers';
+import { Filter, Search, X } from "lucide-react";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -47,17 +46,24 @@ export default function ModernOffersIndex({ offers: initialOffers, pagination: i
   });
   const [sort, setSort] = useState({ field: "created_at", direction: "desc" });
 
-  // Offers Hook für Infinite Scrolling und serverseitige Filterung
-  const {
-    offers,
-    loading,
-    error,
-    loadMore,
-    updateDelayedFilters,
-    updateImmediateFilters,
-    applyFilters,
-    hasMore
-  } = useOffers();
+  // Verwende die initialen Offers direkt
+  const [offers, setOffers] = useState(initialOffers?.data || []);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [hasMore, setHasMore] = useState(initialPagination?.current_page < initialPagination?.last_page);
+
+  // Funktion zum Laden weiterer Offers (für Infinite Scrolling)
+  const loadMore = useCallback(() => {
+    if (loading || !hasMore) return;
+
+    setLoading(true);
+    // Hier könntest du weitere Offers laden
+    // Für jetzt simulieren wir das Laden
+    setTimeout(() => {
+      setLoading(false);
+      setHasMore(false);
+    }, 1000);
+  }, [loading, hasMore]);
 
   // Observer für Infinite Scrolling
   const observer = useRef<IntersectionObserver | null>(null);
@@ -74,29 +80,9 @@ export default function ModernOffersIndex({ offers: initialOffers, pagination: i
     if (node) observer.current.observe(node);
   }, [loading, hasMore, loadMore]);
 
-  // Verzögerte Filter-Änderungen speichern
-  useEffect(() => {
-    updateDelayedFilters({
-      title: search.title,
-      offer_company: search.offer_company,
-      created_at_from: filters.created_at_from
-    });
-  }, [search, filters.created_at_from, updateDelayedFilters]);
-
-  // Sofortige Filter-Änderungen speichern und anwenden
-  useEffect(() => {
-    updateImmediateFilters({
-      offerer_type: filters.offerer_type,
-      status: filters.status,
-      average_rating_min: filters.average_rating_min,
-      sort_field: sort.field,
-      sort_direction: sort.direction
-    });
-  }, [filters.offerer_type, filters.status, filters.average_rating_min, sort, updateImmediateFilters]);
-
   // Funktion zum Anwenden der Filter
   const handleApplyFilters = () => {
-    applyFilters();
+    // Hier könntest du die Filter anwenden, falls nötig
     if (isMobile) {
       setShowFilters(false);
     }
@@ -125,10 +111,7 @@ export default function ModernOffersIndex({ offers: initialOffers, pagination: i
   );
 
   return (
-    <ModernLayout
-      breadcrumbs={breadcrumbs}
-      headerRightContent={!isMobile ? <FilterButton /> : undefined}
-    >
+    <ModernLayout breadcrumbs={breadcrumbs}>
       <Head title="Show Offers" />
 
       {/* Mobile Filter Button */}
@@ -164,8 +147,12 @@ export default function ModernOffersIndex({ offers: initialOffers, pagination: i
           <h1 className="text-2xl font-bold text-[var(--md-on-surface)]">
             Angebote
           </h1>
-          <div className="text-sm text-[var(--md-on-surface-variant)]">
-            {offers.length} Angebote gefunden
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-[var(--md-on-surface-variant)]">
+              {offers.length} Angebote gefunden
+            </div>
+            {/* Filter Button - nur auf Desktop sichtbar und nur wenn Filter geschlossen */}
+            {!isMobile && !showFilters && <FilterButton />}
           </div>
         </div>
 

@@ -4,7 +4,7 @@ import { ModernSidebarToggle } from './ModernSidebar';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { usePage } from '@inertiajs/react';
+import { usePage, Link } from '@inertiajs/react';
 
 interface ModernHeaderProps {
   onSidebarToggle?: () => void;
@@ -47,9 +47,11 @@ export function ModernHeader({
       <div className="flex items-center justify-between px-4 py-3">
         {/* Left Section */}
         <div className="flex items-center gap-4">
-          {showSidebarToggle && onSidebarToggle && (
+          {/*
+          showSidebarToggle && onSidebarToggle && (
             <ModernSidebarToggle onToggle={onSidebarToggle} />
-          )}
+          )
+          */}
 
           {/* Search Bar */}
           <div className="hidden md:block">
@@ -116,8 +118,10 @@ export function ModernHeader({
                 <User className="mr-2 h-4 w-4" />
                 <span>Profil</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <span>Einstellungen</span>
+              <DropdownMenuItem asChild>
+                <Link href="/settings/profile">
+                  <span>Einstellungen</span>
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <span>Abmelden</span>

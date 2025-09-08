@@ -12,7 +12,8 @@ import {
   ArchiveX,
   Target,
   Users,
-  Euro
+  Euro,
+  RotateCcw
 } from 'lucide-react';
 import {
   AlertDialog,
@@ -269,48 +270,66 @@ export default function ModernUserMatchesIndex({ userMatches }: { userMatches: U
 
                     {/* Action Buttons */}
                     <div className="flex items-center gap-2 ml-4">
-                      {match.status === 'opened' && activeTab === 'matches' && (
-                        <div className="flex gap-1">
-                          <Link
-                            href={route('web.user-matches.mark-successful', { id: match.id })}
-                            method="post"
-                            as="button"
-                            className="md-button md-button--filled text-xs p-2"
-                            title="Match als erfolgreich abschließen"
-                            preserveState={false}
-                          >
-                            <CircleCheck className="w-4 h-4" />
-                          </Link>
+                      {/* Buttons für aktive Matches */}
+                      {activeTab === 'matches' && (
+                        <>
+                          {match.status === 'opened' && (
+                            <div className="flex gap-1">
+                              <Link
+                                href={route('web.user-matches.mark-successful', { id: match.id })}
+                                method="post"
+                                as="button"
+                                className="md-button md-button--filled text-xs p-2"
+                                title="Match als erfolgreich abschließen"
+                                preserveState={false}
+                              >
+                                <CircleCheck className="w-4 h-4" />
+                              </Link>
+                              <button
+                                onClick={() => {
+                                  setSelectedMatchId(match.id);
+                                  setDissolveDialogOpen(true);
+                                }}
+                                className="md-button md-button--outlined text-xs p-2 text-[var(--md-error)] border-[var(--md-error)] hover:bg-[var(--md-error-container)]"
+                                title="Match auflösen"
+                              >
+                                <CircleX className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => console.log(`Match ${match.id} gemeldet`)}
+                                className="md-button md-button--outlined text-xs p-2 text-[var(--md-tertiary)] border-[var(--md-tertiary)] hover:bg-[var(--md-tertiary-container)]"
+                                title="Match Partner melden"
+                              >
+                                <CircleAlert className="w-4 h-4" />
+                              </button>
+                            </div>
+                          )}
                           <button
                             onClick={() => {
                               setSelectedMatchId(match.id);
-                              setDissolveDialogOpen(true);
+                              setArchiveDialogOpen(true);
                             }}
-                            className="md-button md-button--outlined text-xs p-2 text-[var(--md-error)] border-[var(--md-error)] hover:bg-[var(--md-error-container)]"
-                            title="Match auflösen"
+                            className="md-button md-button--outlined text-xs p-2"
+                            title="Archivieren"
                           >
-                            <CircleX className="w-4 h-4" />
+                            <Archive className="w-4 h-4" />
                           </button>
-                          <button
-                            onClick={() => console.log(`Match ${match.id} gemeldet`)}
-                            className="md-button md-button--outlined text-xs p-2 text-[var(--md-tertiary)] border-[var(--md-tertiary)] hover:bg-[var(--md-tertiary-container)]"
-                            title="Match Partner melden"
-                          >
-                            <CircleAlert className="w-4 h-4" />
-                          </button>
-                        </div>
+                        </>
                       )}
 
-                      <button
-                        onClick={() => {
-                          setSelectedMatchId(match.id);
-                          setArchiveDialogOpen(true);
-                        }}
-                        className="md-button md-button--outlined text-xs p-2"
-                        title="Archivieren"
-                      >
-                        <Archive className="w-4 h-4" />
-                      </button>
+                      {/* Buttons für archivierte Matches */}
+                      {activeTab === 'archive' && (
+                        <Link
+                          href={route('web.user-matches.unarchive', { id: match.id })}
+                          method="post"
+                          as="button"
+                          className="md-button md-button--filled text-xs p-2"
+                          title="Wiederherstellen"
+                          preserveState={false}
+                        >
+                          <RotateCcw className="w-4 h-4" />
+                        </Link>
+                      )}
                     </div>
                   </div>
                 </div>

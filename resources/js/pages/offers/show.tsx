@@ -1,4 +1,4 @@
-import AppLayout from '@/layouts/app-layout';
+import ModernLayout from '@/layouts/ModernLayout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { Offer } from './index';
@@ -77,11 +77,12 @@ export default function Show({ offer }: { offer: Offer }) {
   }
 
   return (
-    <AppLayout breadcrumbs={breadcrumbs}>
+    <ModernLayout breadcrumbs={breadcrumbs}>
       <Head title={`Offer: ${offer.title}`} />
-      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-        <div className="container mx-auto p-4">
-          <div className="max-w-4xl mx-auto">
+
+      <div className="space-y-6">
+        {/* Offer Details */}
+        <div className="max-w-4xl mx-auto">
             <div className={`bg-white dark:bg-white/10 rounded-xl shadow-lg overflow-hidden relative ${offer.status === 'matched' ? 'opacity-75' : ''}`}>
               {offer.status === 'matched' && (
                 <>
@@ -288,9 +289,8 @@ export default function Show({ offer }: { offer: Offer }) {
                 </div>
               </div>
             </div>
-          </div>
         </div>
       </div>
-    </AppLayout>
+    </ModernLayout>
   );
 }

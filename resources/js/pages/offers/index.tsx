@@ -167,6 +167,7 @@ export default function ModernOffersIndex({ offers: initialOffers, pagination: i
           <div className="text-sm text-[var(--md-on-surface-variant)]">
             {offers.length} Angebote gefunden
           </div>
+
         </div>
 
         {/* Offers Grid */}

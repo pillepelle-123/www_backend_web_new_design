@@ -113,6 +113,8 @@ export default function ModernApplicationsIndex({ applications, unreadCount }: {
   const [matchInfo, setMatchInfo] = useState<{hasActiveMatch: boolean, matchStatus: string | null}>({hasActiveMatch: false, matchStatus: null});
   const [pendingApplicationId, setPendingApplicationId] = useState<number | null>(null);
   const [pendingMatchAction, setPendingMatchAction] = useState<'retract' | 'reject' | 'archive' | null>(null);
+  const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
+  const [pendingArchiveApplication, setPendingArchiveApplication] = useState<Application | null>(null);
 
   // Hilfsfunktion für Bulk-Aktionen
   const handleBulkAction = (action: string) => {
@@ -212,6 +214,33 @@ export default function ModernApplicationsIndex({ applications, unreadCount }: {
         'Content-Type': 'application/json',
       }
     });
+  };
+
+  // Hilfsfunktion für Archivieren-Button
+  const handleArchiveClick = (application: Application) => {
+    // Prüfe ob es eine gesendete Anfrage ist (is_applicant = true) und Status nicht "retracted"
+    if (application.is_applicant && application.status !== 'retracted') {
+      setPendingArchiveApplication(application);
+      setArchiveDialogOpen(true);
+    } else {
+      // Direkt archivieren wenn es keine gesendete Anfrage ist oder bereits zurückgezogen
+      // Erstelle ein Form und submittet es für die Archivieren-Aktion
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = route('web.applications.archive', { id: application.id });
+
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+      if (csrfToken) {
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+      }
+
+      document.body.appendChild(form);
+      form.submit();
+    }
   };
 
   // Prüfe UserMatch und zeige Dialog falls nötig
@@ -421,11 +450,57 @@ export default function ModernApplicationsIndex({ applications, unreadCount }: {
     );
   };
 
+  // Komponente für Archivieren-Dialog
+  const ArchiveDialog = () => {
+    return (
+      <AlertDialog open={archiveDialogOpen} onOpenChange={setArchiveDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Anfrage archivieren</AlertDialogTitle>
+            <AlertDialogDescription>
+              Das Archivieren einer gesendeten Anfrage bedeutet automatisch, dass die Anfrage zurückgezogen wird.
+              Möchten Sie die Anfrage "{pendingArchiveApplication?.title}" archivieren und damit zurückziehen?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+            <AlertDialogAction onClick={() => {
+              if (pendingArchiveApplication) {
+                // Erstelle ein Form und submittet es für die Archivieren-Aktion
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = route('web.applications.archive', { id: pendingArchiveApplication.id });
+
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                if (csrfToken) {
+                  const csrfInput = document.createElement('input');
+                  csrfInput.type = 'hidden';
+                  csrfInput.name = '_token';
+                  csrfInput.value = csrfToken;
+                  form.appendChild(csrfInput);
+                }
+
+                document.body.appendChild(form);
+                form.submit();
+
+                setArchiveDialogOpen(false);
+                setPendingArchiveApplication(null);
+              }
+            }}>
+              Archivieren & Zurückziehen
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    );
+  };
+
   return (
     <ModernLayout breadcrumbs={breadcrumbs}>
       <Head title="Nachrichten" />
       <ConfirmationDialog />
       <UserMatchDialog />
+      <ArchiveDialog />
 
       {/* Header */}
       <div className="mb-8">
@@ -716,25 +791,33 @@ export default function ModernApplicationsIndex({ applications, unreadCount }: {
                           >
                             <CheckCircle className="w-4 h-4" />
                           </Link>
-                          <button
-                            onClick={() => handleActionWithMatchCheck(application.id, 'reject')}
+                          <Link
+                            href={route('web.applications.reject', { id: application.id })}
+                            method="post"
+                            as="button"
                             className="md-button md-button--outlined text-xs p-2 text-[var(--md-error)] border-[var(--md-error)] hover:bg-[var(--md-error-container)]"
                             title="Ablehnen"
+                            preserveState={false}
+                            onClick={() => markAsRead(application.id)}
                           >
                             <Ban className="w-4 h-4" />
-                          </button>
+                          </Link>
                         </div>
                       )}
 
                       {/* Ablehnen-Button für Empfänger bei genehmigten Anträgen */}
                       {!application.is_applicant && application.status === 'approved' && activeTab === 'applications' && (
-                        <button
-                          onClick={() => handleActionWithMatchCheck(application.id, 'reject')}
+                        <Link
+                          href={route('web.applications.reject', { id: application.id })}
+                          method="post"
+                          as="button"
                           className="md-button md-button--outlined text-xs p-2 text-[var(--md-error)] border-[var(--md-error)] hover:bg-[var(--md-error-container)]"
                           title="Ablehnen"
+                          preserveState={false}
+                          onClick={() => markAsRead(application.id)}
                         >
                           <Ban className="w-4 h-4" />
-                        </button>
+                        </Link>
                       )}
 
                       {/* Annehmen-Button für Empfänger bei abgelehnten Anträgen */}
@@ -754,13 +837,17 @@ export default function ModernApplicationsIndex({ applications, unreadCount }: {
 
                       {/* Zurückziehen-Button für Absender */}
                       {application.is_applicant && (application.status === 'pending' || application.status === 'approved') && activeTab === 'applications' && (
-                        <button
-                          onClick={() => handleActionWithMatchCheck(application.id, 'retract')}
+                        <Link
+                          href={route('web.applications.retract', { id: application.id })}
+                          method="post"
+                          as="button"
                           className="md-button md-button--outlined text-xs p-2"
                           title="Zurückziehen"
+                          preserveState={false}
+                          onClick={() => markAsRead(application.id)}
                         >
                           <XCircle className="w-4 h-4" />
-                        </button>
+                        </Link>
                       )}
 
                       {/* Erneut stellen-Button für Absender */}
@@ -781,7 +868,7 @@ export default function ModernApplicationsIndex({ applications, unreadCount }: {
                       {/* Archivieren/Wiederherstellen-Button */}
                       {activeTab === 'applications' && (
                         <button
-                          onClick={() => handleActionWithMatchCheck(application.id, 'archive')}
+                          onClick={() => handleArchiveClick(application)}
                           className="md-button md-button--outlined text-xs p-2"
                           title="Archivieren"
                         >

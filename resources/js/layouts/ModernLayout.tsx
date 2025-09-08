@@ -46,7 +46,7 @@ export default function ModernLayout({
   }, [isMobile]);
 
   return (
-    <div className={`min-h-screen bg-[var(--md-surface)] text-[var(--md-on-surface)] ${className}`}>
+    <div className={`h-full bg-[var(--md-surface)] text-[var(--md-on-surface)] flex flex-col overflow-hidden ${className}`}>
       <Head title={title} />
 
       {/* Header */}
@@ -55,7 +55,8 @@ export default function ModernLayout({
         showSidebarToggle={isMobile && showSidebar}
       />
 
-      <div className="flex">
+      {/* Main Container - takes remaining height */}
+      <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
         {showSidebar && (
           <ModernSidebar
@@ -68,13 +69,12 @@ export default function ModernLayout({
 
         {/* Main Content */}
         <main className={`
-          flex-1 transition-all duration-300 ease-in-out
+          flex-1 transition-all duration-300 ease-in-out flex flex-col overflow-hidden
           ${showSidebar && !isMobile ? 'lg:ml-0' : ''}
-          ${showBottomNavigation ? 'pb-20' : ''}
         `}>
-          {/* Breadcrumbs */}
+          {/* Breadcrumbs - Hidden on mobile */}
           {breadcrumbs.length > 0 && (
-            <div className="px-4 py-3 border-b border-[var(--md-outline-variant)] bg-[var(--md-surface-container-low)]">
+            <div className="hidden lg:block px-4 py-3 border-b border-[var(--md-outline-variant)] bg-[var(--md-surface-container-low)] flex-shrink-0">
               <nav className="flex items-center space-x-2 text-sm">
                 {breadcrumbs.map((breadcrumb, index) => (
                   <div key={breadcrumb.href} className="flex items-center">
@@ -98,7 +98,7 @@ export default function ModernLayout({
           )}
 
           {/* Page Content */}
-          <div className="p-4 lg:p-6">
+          <div className={`p-4 lg:p-6 overflow-y-auto flex-1 ${showBottomNavigation ? 'pb-20' : ''}`}>
             {children}
           </div>
         </main>
