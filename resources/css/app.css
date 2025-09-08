@@ -456,15 +456,15 @@ input[type="number"] {
 
     /* Bottom Navigation */
     .md-bottom-navigation {
-        @apply fixed bottom-0 left-0 right-0 bg-[var(--md-surface-container-low)] border-t border-[var(--md-outline-variant)] px-4 py-2;
+        @apply fixed bottom-0 left-0 right-0 bg-[var(--md-surface-container-low)] border-t border-[var(--md-outline-variant)] px-2 py-3;
     }
 
-    .md-bottom-nav-item {
-        @apply flex flex-col items-center gap-1 px-3 py-2 rounded-lg text-[var(--md-on-surface-variant)] hover:bg-[var(--md-surface-container-high)] transition-colors duration-200;
+    .md-bottom-navigation-item {
+        @apply flex items-center justify-center p-3 rounded-lg text-[var(--md-on-surface-variant)] hover:bg-[var(--md-surface-container-high)] transition-colors duration-200 min-w-0 flex-1;
     }
 
-    .md-bottom-nav-item--active {
-        @apply text-[var(--md-primary)];
+    .md-bottom-navigation-item--active {
+        @apply text-[var(--md-primary)] bg-[var(--md-primary-container)]/20;
     }
 
     /* Spinner */
