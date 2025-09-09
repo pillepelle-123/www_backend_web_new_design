@@ -74,7 +74,7 @@ export default function ModernLayout({
         `}>
           {/* Breadcrumbs - Hidden on mobile */}
           {breadcrumbs.length > 0 && (
-            <div className="hidden lg:block px-4 py-3 border-b border-[var(--md-outline-variant)] bg-[var(--md-surface-container-low)] flex-shrink-0">
+            <div className="hidden lg:block px-4 py-3 bg-[var(--md-surface-container-low)] flex-shrink-0">
               <nav className="flex items-center space-x-2 text-sm">
                 {breadcrumbs.map((breadcrumb, index) => (
                   <div key={breadcrumb.href} className="flex items-center">
