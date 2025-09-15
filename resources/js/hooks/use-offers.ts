@@ -20,7 +20,7 @@ interface PaginationData {
   total: number;
 }
 
-export const useOffers = (initialOffers?: Offer[], initialPagination?: PaginationData) => {
+export const useOffers = (initialOffers?: Offer[], initialPagination?: PaginationData, initialSearch?: string) => {
   const [offers, setOffers] = useState<Offer[]>(initialOffers || []);
   const [pagination, setPagination] = useState<PaginationData>(initialPagination || {
     current_page: 1,
@@ -65,6 +65,11 @@ export const useOffers = (initialOffers?: Offer[], initialPagination?: Paginatio
 
       // Always filter for active offers only
       params.append('admin_status', 'active');
+      
+      // Add search parameter if it exists
+      if (initialSearch) {
+        params.append('search', initialSearch);
+      }
       
       // Filter hinzufügen
       Object.entries(activeFilters).forEach(([key, value]) => {
@@ -179,10 +184,13 @@ export const useOffers = (initialOffers?: Offer[], initialPagination?: Paginatio
         fetchOffers(1, true);
       }
     } else {
-      // Subsequent renders: always fetch when filters change
-      fetchOffers(1, true);
+      // Only fetch when filters change if there's no initial search
+      // If there's an initial search, preserve the initial results
+      if (!initialSearch) {
+        fetchOffers(1, true);
+      }
     }
-  }, [activeFilters, fetchOffers, initialOffers, hasInitialized]);
+  }, [activeFilters, fetchOffers, initialOffers, hasInitialized, initialSearch]);
 
   return {
     offers,

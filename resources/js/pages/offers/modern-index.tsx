@@ -16,7 +16,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 
-export default function ModernOffersIndex({ offers: initialOffers, pagination: initialPagination }) {
+export default function ModernOffersIndex({ offers: initialOffers, pagination: initialPagination, search: initialSearch }) {
   const [showFilters, setShowFilters] = useState(false);
   const [isApplyingFilters, setIsApplyingFilters] = useState(false);
   const [search, setSearch] = useState({ title: "", offer_company: "" });
@@ -39,7 +39,7 @@ export default function ModernOffersIndex({ offers: initialOffers, pagination: i
     updateImmediateFilters,
     applyFilters,
     hasMore
-  } = useOffers(initialOffers?.data, initialPagination);
+  } = useOffers(initialOffers?.data, initialPagination, initialSearch);
 
   // Observer für Infinite Scrolling
   const observer = useRef<IntersectionObserver | null>(null);

@@ -175,53 +175,54 @@ input[type="number"] {
 :root {
     /* Material Design 3 Color System - Light Theme */
 
-    /* Primary Colors - Dunkles Blau (#1B3C53) */
-    --md-primary: #1B3C53;
-    --md-on-primary: #F9F3EF;
-    --md-primary-container: #456882;
-    --md-on-primary-container: #F9F3EF;
+    /* Primary Colors - Highlight Blue (#0077B6) */
+    --md-primary: #0077B6;
+    --md-on-primary: #FFFFFF;
+    --md-primary-container: #E4EAF1;
+    --md-on-primary-container: #2C3339;
 
-    /* Secondary Colors - Mittleres Blau (#456882) */
-    --md-secondary: #456882;
-    --md-on-secondary: #F9F3EF;
-    --md-secondary-container: #D2C1B6;
-    --md-on-secondary-container: #1B3C53;
+    /* Secondary Colors - Medium Gray (#34495E) */
+    --md-secondary: #34495E;
+    --md-on-secondary: #FFFFFF;
+    --md-secondary-container: #E4EAF1;
+    --md-on-secondary-container: #2C3339;
 
-    /* Tertiary Colors - Warmes Beige (#D2C1B6) */
-    --md-tertiary: #D2C1B6;
-    --md-on-tertiary: #1B3C53;
-    --md-tertiary-container: #F9F3EF;
-    --md-on-tertiary-container: #1B3C53;
+    /* Tertiary Colors - Light Blue (#e4eaf1) */
+    --md-tertiary: #e4eaf1;
+    --md-on-tertiary: #2C3339;
+    --md-tertiary-container: #FFFFFF;
+    --md-on-tertiary-container: #2C3339;
 
-    /* Error Colors - Braun-Ton basierend auf Palette */
-    --md-error: #8B4513;
-    --md-on-error: #F9F3EF;
-    --md-error-container: #D2C1B6;
-    --md-on-error-container: #1B3C53;
+    /* Error Colors - Rot-Ton basierend auf Palette */
+    --md-error: #B91C1C;
+    --md-on-error: #FFFFFF;
+    --md-error-container: #FEE2E2;
+    --md-on-error-container: #7F1D1D;
 
     /* Success Colors - Grün-Ton basierend auf Palette */
-    --md-success: #2D5016;
-    --md-on-success: #F9F3EF;
-    --md-success-container: #D2C1B6;
-    --md-on-success-container: #1B3C53;
+    --md-success: #166534;
+    --md-on-success: #FFFFFF;
+    --md-success-container: #DCFCE7;
+    --md-on-success-container: #14532D;
 
-    /* Surface Colors - Cremiges Weiß (#F9F3EF) */
-    --md-surface: #F9F3EF;
-    --md-on-surface: #1B3C53;
-    --md-surface-variant: #D2C1B6;
-    --md-on-surface-variant: #1B3C53;
+    /* Surface Colors - White (#FFFFFF) */
+    --md-surface: #FFFFFF;
+    --md-on-surface: #2C3339;
+    --md-surface-variant: #E4EAF1;
+    --md-on-surface-variant: #2C3339;
     --md-surface-container-lowest: #FFFFFF;
-    --md-surface-container-low: #F9F3EF;
-    --md-surface-container: #D2C1B6;
-    --md-surface-container-high: #D2C1B6;
-    --md-surface-container-highest: #D2C1B6;
+    --md-surface-container-low: #FFFFFF;
+    --md-surface-container: #E4EAF1;
+    --md-surface-container-high: #34495E;
+    --md-on-surface-container-high: #FFFFFF;
+    --md-surface-container-highest: #2C3339;
 
     /* Outline Colors */
-    --md-outline: #456882;
-    --md-outline-variant: #D2C1B6;
+    --md-outline: #34495E;
+    --md-outline-variant: #E4EAF1;
 
     /* Scrim */
-    --md-scrim: #1B3C53;
+    --md-scrim: #2C3339;
 
     /* Legacy compatibility */
     --background: var(--md-surface);
@@ -263,53 +264,54 @@ input[type="number"] {
 .dark {
     /* Material Design 3 Color System - Dark Theme */
 
-    /* Primary Colors - Dunkles Blau (#1B3C53) - Dark Theme */
-    --md-primary: #456882;
-    --md-on-primary: #F9F3EF;
-    --md-primary-container: #1B3C53;
-    --md-on-primary-container: #F9F3EF;
+    /* Primary Colors - Highlight Blue (#0077B6) - Dark Theme */
+    --md-primary: #0077B6;
+    --md-on-primary: #FFFFFF;
+    --md-primary-container: #34495E;
+    --md-on-primary-container: #FFFFFF;
 
-    /* Secondary Colors - Mittleres Blau (#456882) - Dark Theme */
-    --md-secondary: #D2C1B6;
-    --md-on-secondary: #1B3C53;
-    --md-secondary-container: #456882;
-    --md-on-secondary-container: #F9F3EF;
+    /* Secondary Colors - Light Blue (#E4EAF1) - Dark Theme */
+    --md-secondary: #E4EAF1;
+    --md-on-secondary: #2C3339;
+    --md-secondary-container: #34495E;
+    --md-on-secondary-container: #FFFFFF;
 
-    /* Tertiary Colors - Warmes Beige (#D2C1B6) - Dark Theme */
-    --md-tertiary: #F9F3EF;
-    --md-on-tertiary: #1B3C53;
-    --md-tertiary-container: #D2C1B6;
-    --md-on-tertiary-container: #1B3C53;
+    /* Tertiary Colors - Light Blue (#e4eaf1) - Dark Theme */
+    --md-tertiary: #e4eaf1;
+    --md-on-tertiary: #2C3339;
+    --md-tertiary-container: #E4EAF1;
+    --md-on-tertiary-container: #2C3339;
 
-    /* Error Colors - Braun-Ton - Dark Theme */
-    --md-error: #D2691E;
-    --md-on-error: #F9F3EF;
-    --md-error-container: #8B4513;
-    --md-on-error-container: #F9F3EF;
+    /* Error Colors - Rot-Ton - Dark Theme */
+    --md-error: #EF4444;
+    --md-on-error: #FFFFFF;
+    --md-error-container: #B91C1C;
+    --md-on-error-container: #FFFFFF;
 
     /* Success Colors - Grün-Ton - Dark Theme */
-    --md-success: #4A7C59;
-    --md-on-success: #F9F3EF;
-    --md-success-container: #2D5016;
-    --md-on-success-container: #F9F3EF;
+    --md-success: #22C55E;
+    --md-on-success: #FFFFFF;
+    --md-success-container: #166534;
+    --md-on-success-container: #FFFFFF;
 
-    /* Surface Colors - Dunkles Blau - Dark Theme */
-    --md-surface: #1B3C53;
-    --md-on-surface: #F9F3EF;
-    --md-surface-variant: #456882;
-    --md-on-surface-variant: #D2C1B6;
-    --md-surface-container-lowest: #0F2A3A;
-    --md-surface-container-low: #1B3C53;
-    --md-surface-container: #456882;
-    --md-surface-container-high: #456882;
-    --md-surface-container-highest: #456882;
+    /* Surface Colors - Dark Gray (#2C3339) - Dark Theme */
+    --md-surface: #2C3339;
+    --md-on-surface: #FFFFFF;
+    --md-surface-variant: #34495E;
+    --md-on-surface-variant: #E4EAF1;
+    --md-surface-container-lowest: #1A1E22;
+    --md-surface-container-low: #2C3339;
+    --md-surface-container: #34495E;
+    --md-surface-container-high: #E4EAF1;
+    --md-on-surface-container-high: #34495E;
+    --md-surface-container-highest: #FFFFFF;
 
     /* Outline Colors - Dark Theme */
-    --md-outline: #D2C1B6;
-    --md-outline-variant: #456882;
+    --md-outline: #E4EAF1;
+    --md-outline-variant: #34495E;
 
     /* Scrim */
-    --md-scrim: #1B3C53;
+    --md-scrim: #2C3339;
 
     /* Legacy compatibility */
     --background: var(--md-surface);
@@ -390,7 +392,7 @@ input[type="number"] {
     }
 
     .md-sidebar-header {
-        @apply p-4 border-b border-[var(--md-outline-variant)];
+        @apply p-4 border-[var(--md-outline-variant)];
     }
 
     .md-sidebar-content {
@@ -403,7 +405,7 @@ input[type="number"] {
 
     /* Navigation Items */
     .md-navigation-item {
-        @apply flex items-center gap-3 px-3 py-2 rounded-lg text-[var(--md-on-surface)] hover:bg-[var(--md-surface-container-high)] transition-colors duration-200;
+        @apply flex items-center gap-3 px-3 py-2 rounded-lg text-[var(--md-on-surface)] hover:bg-[var(--md-surface-container-high)] hover:text-[var(--md-on-surface-container-high)] transition-colors duration-200;
     }
 
     .md-navigation-item--active {
@@ -412,7 +414,7 @@ input[type="number"] {
 
     /* Cards */
     .md-card {
-        @apply bg-[var(--md-surface-container)] rounded-xl border border-[var(--md-outline-variant)] transition-all duration-200;
+        @apply bg-[var(--md-surface)] rounded-xl border border-[var(--md-outline-variant)];
     }
 
     .md-card--elevated {
@@ -454,7 +456,7 @@ input[type="number"] {
     }
 
     .md-badge--success {
-        @apply bg-[var(--md-success-container)] text-[var(--md-on-success-container)];
+        @apply bg-green-100 text-green-800;
     }
 
     .md-badge--error {

@@ -46,7 +46,7 @@ export default function Show({ rating }: { rating: RatingData }) {
       return (
         <Star
           key={starNumber}
-          className={`w-6 h-6 ${isActive ? 'text-[var(--md-tertiary)] fill-current' : 'text-[var(--md-outline-variant)]'}`}
+          className={`w-6 h-6 ${isActive ? 'fill-yellow-500 stroke-yellow-500' : 'fill-none stroke-yellow-500'}`}
         />
       );
     });

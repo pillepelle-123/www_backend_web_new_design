@@ -19,7 +19,13 @@ class OfferController extends Controller
         $perPage = 20; // Anzahl der Datensätze pro Seite
 
         $query = Offer::query()
-            ->with(['offerer', 'company']);
+            ->with(['offerer', 'company'])
+            ->active(); // Hard filter for active offers
+
+        // Global search
+        if ($request->has('search') && !empty($request->search)) {
+            $query->search($request->search);
+        }
 
         // Suche (case-insensitive)
         if ($request->has('title') && !empty($request->title)) {
@@ -107,6 +113,7 @@ class OfferController extends Controller
                 'per_page' => $offers->perPage(),
                 'total' => $offers->total(),
             ],
+            'search' => $request->input('search', ''),
         ]);
     }
 

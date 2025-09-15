@@ -184,6 +184,26 @@ class Offer extends Model
         return $query->where('offerer_type', 'referrer');
     }
 
+    /**
+     * Scope for searching offers
+     */
+    public function scopeSearch($query, $searchTerm)
+    {
+        if (empty($searchTerm)) {
+            return $query;
+        }
+
+        return $query->where(function ($q) use ($searchTerm) {
+            $q->where('offers.title', 'LIKE', "%{$searchTerm}%")
+              ->orWhereHas('company', function ($companyQuery) use ($searchTerm) {
+                  $companyQuery->where('name', 'LIKE', "%{$searchTerm}%");
+              })
+              ->orWhereHas('offerer', function ($userQuery) use ($searchTerm) {
+                  $userQuery->where('name', 'LIKE', "%{$searchTerm}%");
+              });
+        });
+    }
+
 
 
     /**

@@ -135,9 +135,13 @@ export function ModernSidebar({
 
         {/* Footer */}
         <div className="md-sidebar-footer">
-          <div className="text-xs text-[var(--md-on-surface-variant)] text-center">
-            © 2024 Referral Portal
+            <div className="text-xs text-[var(--md-on-surface-variant)] text-left mb-3 pl-3">
+            Impressum
           </div>
+          <div className="text-xs text-[var(--md-on-surface-variant)] text-left mb-3 pl-3">
+            © 2025 Wer Wirbt Wen
+          </div>
+
         </div>
       </aside>
     </>

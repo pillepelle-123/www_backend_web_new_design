@@ -4,7 +4,8 @@ import { ModernSidebarToggle } from './ModernSidebar';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { usePage, Link } from '@inertiajs/react';
+import { usePage, Link, router } from '@inertiajs/react';
+import AppLogo from '@/components/app-logo';
 
 interface ModernHeaderProps {
   onSidebarToggle?: () => void;
@@ -19,7 +20,25 @@ export function ModernHeader({
 }: ModernHeaderProps) {
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showSearchButton, setShowSearchButton] = useState(false);
   const page = usePage();
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    setShowSearchButton(value.trim().length > 0);
+  };
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      router.get('/offers', { search: searchQuery.trim() });
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light';
@@ -47,6 +66,9 @@ export function ModernHeader({
       <div className="flex items-center justify-between px-4 py-3">
         {/* Left Section */}
         <div className="flex items-center gap-4">
+          {/* App Logo */}
+          <AppLogo />
+          
           {/*
           showSidebarToggle && onSidebarToggle && (
             <ModernSidebarToggle onToggle={onSidebarToggle} />
@@ -55,15 +77,26 @@ export function ModernHeader({
 
           {/* Search Bar */}
           <div className="hidden md:block">
-            <div className="md-search-bar w-80">
-              <Search className="md-search-icon" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="md-search-input"
-                placeholder="Angebote durchsuchen..."
-              />
+            <div className="flex items-center gap-2">
+              <div className="md-search-bar w-80">
+                <Search className="md-search-icon" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  className="md-search-input"
+                  placeholder="Angebote durchsuchen..."
+                />
+              </div>
+              {showSearchButton && (
+                <Button
+                  onClick={handleSearch}
+                  className="md-button md-button--filled"
+                >
+                  Suchen
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -132,15 +165,26 @@ export function ModernHeader({
 
       {/* Mobile Search */}
       <div className="md:hidden px-4 pb-3">
-        <div className="md-search-bar">
-          <Search className="md-search-icon" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="md-search-input"
-            placeholder="Angebote durchsuchen..."
-          />
+        <div className="flex items-center gap-2">
+          <div className="md-search-bar flex-1">
+            <Search className="md-search-icon" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              onKeyPress={handleKeyPress}
+              className="md-search-input"
+              placeholder="Angebote durchsuchen..."
+            />
+          </div>
+          {showSearchButton && (
+            <Button
+              onClick={handleSearch}
+              className="md-button md-button--filled"
+            >
+              Suchen
+            </Button>
+          )}
         </div>
       </div>
     </header>

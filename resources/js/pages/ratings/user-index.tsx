@@ -1,7 +1,7 @@
-import AppLayout from '@/layouts/app-layout';
+import ModernLayout from '@/layouts/ModernLayout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { Star } from 'lucide-react';
+import { Star, UserRound, MessageSquare } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -55,94 +55,112 @@ export default function UserIndex({ user, ratings }: { user: UserData, ratings: 
       return (
         <Star
           key={starNumber}
-          className={`w-4 h-4 ${isActive ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+          className={`w-5 h-5 ${isActive ? 'fill-yellow-500 stroke-yellow-500' : 'fill-none stroke-yellow-500'}`}
         />
       );
     });
   };
 
   return (
-    <AppLayout breadcrumbs={breadcrumbs}>
+    <ModernLayout breadcrumbs={breadcrumbs}>
       <Head title={`Bewertungen von ${user.name}`} />
-      <div className="container mx-auto p-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white dark:bg-white/10 rounded-xl shadow-lg overflow-hidden">
-            <div className="p-6">
-              <div className="mb-6">
-                <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
-                  Bewertungen von {user.name}
-                </h1>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1">
-                    {renderStars(Math.floor(user.average_rating))}
-                  </div>
-                  <span className="text-lg font-medium">
-                    {user.average_rating.toFixed(1)}/5
-                  </span>
-                  <span className="text-sm text-gray-500">
-                    ({ratings.total} Bewertungen)
-                  </span>
-                </div>
-              </div>
 
-              {ratings.data.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  Noch keine Bewertungen vorhanden
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {ratings.data.map((rating, index) => (
-                    <div key={index} className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-1">
-                          {renderStars(rating.score)}
-                          <span className="ml-2 font-medium">{rating.score}/5</span>
-                        </div>
-                        <span className="text-sm text-gray-500">
-                          {formatDate(rating.created_at)}
-                        </span>
-                      </div>
-                      {rating.comment && (
-                        <p className="text-gray-600 dark:text-gray-300 mt-2">
-                          {rating.comment}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Pagination */}
-              {ratings.last_page > 1 && (
-                <div className="flex justify-center mt-6">
-                  <nav className="flex items-center gap-2">
-                    {ratings.links.map((link, index) => (
-                      <div key={index}>
-                        {link.url ? (
-                          <Link
-                            href={link.url}
-                            className={`px-3 py-2 text-sm rounded-md ${
-                              link.active
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                            dangerouslySetInnerHTML={{ __html: link.label }}
-                          />
-                        ) : (
-                          <span
-                            className="px-3 py-2 text-sm text-gray-400"
-                            dangerouslySetInnerHTML={{ __html: link.label }}
-                          />
-                        )}
-                      </div>
-                    ))}
-                  </nav>
-                </div>
-              )}
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-[var(--md-on-surface)] mb-4">
+          Bewertungen von {user.name}
+        </h1>
+        
+        {/* User Rating Summary */}
+        <div className="md-card md-card--elevated p-6">
+          <h2 className="text-lg font-semibold text-[var(--md-on-surface)] mb-4 flex items-center gap-2">
+            <UserRound className="w-5 h-5" />
+            Durchschnittsbewertung
+          </h2>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              {renderStars(Math.floor(user.average_rating))}
             </div>
+            <span className="text-lg font-medium text-[var(--md-on-surface)]">
+              {user.average_rating.toFixed(1)}/5
+            </span>
+            <span className="text-sm text-[var(--md-on-surface-variant)]">
+              ({ratings.total} Bewertungen)
+            </span>
           </div>
         </div>
       </div>
-    </AppLayout>
+
+      {/* Ratings List */}
+      {ratings.data.length === 0 ? (
+        <div className="md-empty-state">
+          <Star className="md-empty-state-icon" />
+          <h3 className="md-empty-state-title">
+            Noch keine Bewertungen vorhanden
+          </h3>
+          <p className="md-empty-state-description">
+            Dieser Benutzer hat noch keine Bewertungen erhalten.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-6 mb-8">
+          {ratings.data.map((rating, index) => (
+            <div key={index} className="md-card md-card--elevated p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Star className="w-5 h-5 text-[var(--md-on-surface-variant)]" />
+                  <div className="flex items-center gap-1">
+                    {renderStars(rating.score)}
+                    <span className="ml-2 text-lg font-medium text-[var(--md-on-surface)]">{rating.score}/5</span>
+                  </div>
+                </div>
+                <span className="text-sm text-[var(--md-on-surface-variant)]">
+                  {formatDate(rating.created_at)}
+                </span>
+              </div>
+              {rating.comment && (
+                <div>
+                  <h3 className="text-sm font-medium text-[var(--md-on-surface-variant)] mb-2 flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4" />
+                    Kommentar
+                  </h3>
+                  <p className="text-[var(--md-on-surface)]">
+                    {rating.comment}
+                  </p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {ratings.last_page > 1 && (
+        <div className="flex justify-center">
+          <nav className="flex items-center gap-2">
+            {ratings.links.map((link, index) => (
+              <div key={index}>
+                {link.url ? (
+                  <Link
+                    href={link.url}
+                    className={`md-button ${
+                      link.active
+                        ? 'md-button--filled'
+                        : 'md-button--outlined'
+                    }`}
+                    dangerouslySetInnerHTML={{ __html: link.label }}
+                  />
+                ) : (
+                  <span
+                    className="px-3 py-2 text-sm text-[var(--md-on-surface-variant)]"
+                    dangerouslySetInnerHTML={{ __html: link.label }}
+                  />
+                )}
+              </div>
+            ))}
+          </nav>
+        </div>
+      )}
+    </ModernLayout>
   );
 }

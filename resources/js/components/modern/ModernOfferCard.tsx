@@ -117,7 +117,7 @@ export function ModernOfferCard({ offer }: ModernOfferCardProps) {
   };
 
   return (
-    <div className="md-card md-card--elevated relative overflow-hidden group">
+    <div className="md-card md-card--elevated relative overflow-hidden group h-full flex flex-col">
       {getStatusBadge()}
 
       {/* Company Logo Background */}
@@ -131,7 +131,7 @@ export function ModernOfferCard({ offer }: ModernOfferCardProps) {
         </div>
       )}
 
-      <div className="p-6 relative">
+      <div className="p-6 relative flex-1 flex flex-col">
         {/* Header with Date */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2 text-sm text-[var(--md-on-surface-variant)]">
@@ -142,7 +142,7 @@ export function ModernOfferCard({ offer }: ModernOfferCardProps) {
         </div>
 
         {/* Title */}
-        <h3 className="text-xl font-semibold text-[var(--md-on-surface)] mb-3 group-hover:text-[var(--md-primary)] transition-colors">
+        <h3 className="text-xl font-semibold text-[var(--md-on-surface)] mb-3 group-hover:text-[var(--md-primary)] transition-colors h-14 flex items-start">
           {truncateText(offer.title, 60)}
         </h3>
 
@@ -211,15 +211,7 @@ export function ModernOfferCard({ offer }: ModernOfferCardProps) {
           </Link>
 
           {/* Offerer Type Badge */}
-          <div
-            className="flex items-center gap-2 px-3 py-2 bg-[var(--md-surface-container-high)] rounded-lg text-sm text-[var(--md-on-surface)]"
-            onMouseEnter={e => {
-              const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-              setTooltipPos({ x: rect.left, y: rect.top });
-              setShowTypeTooltip(true);
-            }}
-            onMouseLeave={() => setShowTypeTooltip(false)}
-          >
+          <div className="flex items-center gap-2 px-3 py-2 bg-[var(--md-surface-container-high)] rounded-lg text-sm text-[var(--md-on-surface-container-high)]">
             <UsersRound className="w-4 h-4" />
             <span>{offer.offerer_type}</span>
           </div>
@@ -239,17 +231,7 @@ export function ModernOfferCard({ offer }: ModernOfferCardProps) {
         document.body
       )}
 
-      {showTypeTooltip && tooltipPos && createPortal(
-        <div
-          className="fixed z-[9999] pointer-events-none transition-opacity duration-300 opacity-100"
-          style={{ left: tooltipPos.x - 110, top: tooltipPos.y }}
-        >
-          <div className="bg-[var(--md-surface-container-highest)] text-[var(--md-on-surface)] text-sm rounded-lg p-2 shadow-lg border border-[var(--md-outline-variant)] max-w-60">
-            <strong>{offer.offerer_type}:</strong> {getTooltipText(offer.offerer_type)}
-          </div>
-        </div>,
-        document.body
-      )}
+
     </div>
   );
 }
