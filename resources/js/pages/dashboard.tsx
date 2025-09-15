@@ -21,7 +21,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 
-export default function ModernDashboard({ auth }: PageProps) {
+export default function ModernDashboard({ auth, activeOffersCount, newOffersLast7Days, unreadApplicationsCount, totalApplicationsCount }: PageProps & { activeOffersCount: number; newOffersLast7Days: number; unreadApplicationsCount?: number; totalApplicationsCount: number }) {
+    const unreadCount = unreadApplicationsCount || 0;
+
     return (
         <ModernLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
@@ -39,25 +41,26 @@ export default function ModernDashboard({ auth }: PageProps) {
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <div className="md-card md-card--elevated p-6">
+                    <p className="text-sm text-[var(--md-on-surface-variant)] mb-4">Aktive Angebote</p>
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-[var(--md-on-surface-variant)] mb-1">Aktive Angebote</p>
-                            <p className="text-2xl font-bold text-[var(--md-on-surface)]">12</p>
+                            <p className="text-2xl font-bold text-[var(--md-on-surface)]">{activeOffersCount}</p>
+                            <div className="mt-2 flex items-center text-sm">
+                                <TrendingUp className="w-4 h-4 text-[var(--md-success)] mr-1" />
+                                <span className="text-[var(--md-success)]">+{newOffersLast7Days} letzte 7 Tage</span>
+                            </div>
                         </div>
                         <div className="p-3 bg-[var(--md-primary-container)] rounded-lg">
                             <Target className="w-6 h-6 text-[var(--md-on-primary-container)]" />
                         </div>
                     </div>
-                    <div className="mt-4 flex items-center text-sm">
-                        <TrendingUp className="w-4 h-4 text-[var(--md-success)] mr-1" />
-                        <span className="text-[var(--md-success)]">+2 diese Woche</span>
-                    </div>
                 </div>
 
+{ /*}
                 <div className="md-card md-card--elevated p-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-[var(--md-on-surface-variant)] mb-1">Bewerbungen</p>
+                            <p className="text-sm text-[var(--md-on-surface-variant)] mb-1">Anfragen</p>
                             <p className="text-2xl font-bold text-[var(--md-on-surface)]">8</p>
                         </div>
                         <div className="p-3 bg-[var(--md-secondary-container)] rounded-lg">
@@ -69,37 +72,45 @@ export default function ModernDashboard({ auth }: PageProps) {
                         <span className="text-[var(--md-primary)]">3 neue heute</span>
                     </div>
                 </div>
+*/}
 
                 <div className="md-card md-card--elevated p-6">
+                    <p className="text-sm text-[var(--md-on-surface-variant)] mb-4">Anfragen</p>
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-[var(--md-on-surface-variant)] mb-1">Matches</p>
-                            <p className="text-2xl font-bold text-[var(--md-on-surface)]">5</p>
+                            <p className="text-2xl font-bold text-[var(--md-on-surface)]">{unreadCount}</p>
+                            <div className="mt-2 text-sm">
+                                <span className="text-[var(--md-on-surface-variant)]">Ungelesen</span>
+                            </div>
                         </div>
-                        <div className="p-3 bg-[var(--md-tertiary-container)] rounded-lg">
-                            <Handshake className="w-6 h-6 text-[var(--md-on-tertiary-container)]" />
-                        </div>
-                    </div>
-                    <div className="mt-4 flex items-center text-sm">
-                        <TrendingUp className="w-4 h-4 text-[var(--md-success)] mr-1" />
-                        <span className="text-[var(--md-success)]">+1 diese Woche</span>
-                    </div>
-                </div>
-
-                <div className="md-card md-card--elevated p-6">
-                    <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-[var(--md-on-surface-variant)] mb-1">Nachrichten</p>
-                            <p className="text-2xl font-bold text-[var(--md-on-surface)]">3</p>
+                            <p className="text-2xl font-bold text-[var(--md-on-surface)]">{totalApplicationsCount}</p>
+                            <div className="mt-2 text-sm">
+                                <span className="text-[var(--md-on-surface-variant)]">Alle</span>
+                            </div>
                         </div>
                         <div className="p-3 bg-[var(--md-error-container)] rounded-lg">
                             <Mail className="w-6 h-6 text-[var(--md-on-error-container)]" />
                         </div>
                     </div>
-                    <div className="mt-4 flex items-center text-sm">
-                        <span className="text-[var(--md-on-surface-variant)]">Ungelesen</span>
+                </div>
+
+                <div className="md-card md-card--elevated p-6">
+                    <p className="text-sm text-[var(--md-on-surface-variant)] mb-4">Matches</p>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-2xl font-bold text-[var(--md-on-surface)]">5</p>
+                            <div className="mt-2 flex items-center text-sm">
+                                <TrendingUp className="w-4 h-4 text-[var(--md-success)] mr-1" />
+                                <span className="text-[var(--md-success)]">+1 diese Woche</span>
+                            </div>
+                        </div>
+                        <div className="p-3 bg-[var(--md-tertiary-container)] rounded-lg">
+                            <Handshake className="w-6 h-6 text-[var(--md-on-tertiary-container)]" />
+                        </div>
                     </div>
                 </div>
+
             </div>
 
             {/* Quick Actions */}
@@ -117,7 +128,7 @@ export default function ModernDashboard({ auth }: PageProps) {
                         </button>
                         <button className="md-button md-button--outlined w-full justify-start">
                             <Mail className="w-4 h-4 mr-2" />
-                            Nachrichten anzeigen
+                            Anfragen anzeigen
                         </button>
                     </div>
                 </div>

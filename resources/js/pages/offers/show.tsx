@@ -170,12 +170,22 @@ export default function Show({ offer, returnUrl }: { offer: Offer, returnUrl?: s
 
       {/* Actions */}
       <div className="flex justify-between items-center">
-        <Link
-          href={`/offers${finalReturnUrl}`}
-          className="md-button md-button--outlined"
-        >
-          Zurück zur Übersicht
-        </Link>
+        <div className="flex gap-4">
+          <Link
+            href={`/offers${finalReturnUrl}`}
+            className="md-button md-button--outlined"
+          >
+            Zurück zur Übersicht
+          </Link>
+          {offer.is_offerer && (
+            <Link
+              href={`/my-offers/${offer.id}/edit`}
+              className="md-button md-button--outlined"
+            >
+              Bearbeiten
+            </Link>
+          )}
+        </div>
 
         {/* Zeige den Anfragen-Button, wenn der Benutzer keine aktive Anfrage hat oder die Anfrage zurückgezogen wurde */}
         {(!offer.has_application || offer.application_status === 'retracted') && !offer.is_offerer && offer.status !== 'matched' && (

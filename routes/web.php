@@ -36,6 +36,12 @@ Route::middleware('auth')->group(function () {
         Route::post('/{id}/apply', [OfferController::class, 'apply'])->name('apply');
     });
 
+    // My Offers
+    Route::get('/my-offers', [OfferController::class, 'myOffers'])->name('web.offers.my-offers');
+    Route::post('/my-offers/{id}/status', [OfferController::class, 'updateStatus'])->name('web.offers.update-status');
+    Route::get('/my-offers/{id}/edit', [OfferController::class, 'edit'])->name('web.offers.edit');
+    Route::put('/my-offers/{id}', [OfferController::class, 'update'])->name('web.offers.update');
+
     // Applications
     Route::prefix('applications')->name('web.applications.')->group(function () {
         Route::get('/', [ApplicationController::class, 'index'])->name('index');

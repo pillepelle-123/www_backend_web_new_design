@@ -4,7 +4,8 @@ import {
   ListTodo,
   CirclePlus,
   Mail,
-  Handshake
+  Handshake,
+  FolderOpen
 } from 'lucide-react';
 
 interface NavigationItem {
@@ -32,6 +33,11 @@ export function ModernBottomNavigation({ className = '' }: ModernBottomNavigatio
       title: 'Angebote',
       href: '/offers',
       icon: ListTodo,
+    },
+    {
+      title: 'Meine Angebote',
+      href: '/my-offers',
+      icon: FolderOpen,
     },
     {
       title: 'Erstellen',

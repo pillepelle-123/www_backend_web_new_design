@@ -1,7 +1,7 @@
 import ModernLayout from '@/layouts/ModernLayout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   CheckCircle,
   CircleCheck,
@@ -55,6 +55,19 @@ export default function ModernUserMatchesIndex({ userMatches }: { userMatches: U
   const [dissolveDialogOpen, setDissolveDialogOpen] = useState(false);
   const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
   const [selectedMatchId, setSelectedMatchId] = useState<number | null>(null);
+
+  // Mark new matches as seen when page loads
+  useEffect(() => {
+    fetch('/user-matches/mark-seen', {
+      method: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        'Content-Type': 'application/json',
+      }
+    }).catch(error => {
+      console.error('Error marking matches as seen:', error);
+    });
+  }, []);
 
   const filteredMatches = userMatches.filter(match => {
     if (activeTab === 'matches' && match.is_archived) return false;

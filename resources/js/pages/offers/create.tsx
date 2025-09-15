@@ -153,7 +153,7 @@ export default function Create({ companies }: { companies: Company[] }) {
             <div className="md-card md-card--elevated p-6">
                 <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
-                            <label className="md-label">
+                            <label className="flex gap-1 md-label">
                                 <UserRound className="w-4 h-4" />
                                 Du bist...
                             </label>
@@ -224,7 +224,7 @@ export default function Create({ companies }: { companies: Company[] }) {
                             )}
                         </div>
                         <div>
-                            <label htmlFor="title" className="md-label">
+                            <label htmlFor="title" className="flex gap-1 md-label">
                                 <FileText className="w-4 h-4" />
                                 Titel
                             </label>
@@ -242,7 +242,7 @@ export default function Create({ companies }: { companies: Company[] }) {
                             )}
                         </div>
                         <div>
-                            <label htmlFor="description" className="md-label">
+                            <label htmlFor="description" className="flex gap-1 md-label">
                                 <FileText className="w-4 h-4" />
                                 Beschreibung
                             </label>
@@ -260,7 +260,7 @@ export default function Create({ companies }: { companies: Company[] }) {
                             )}
                         </div>
                         <div>
-                            <label htmlFor="company" className="md-label">
+                            <label htmlFor="company" className="flex gap-1 md-label">
                                 <Building2 className="w-4 h-4" />
                                 Anbieter
                             </label>
@@ -282,7 +282,7 @@ export default function Create({ companies }: { companies: Company[] }) {
                             )}
                         </div>
                         <div>
-                            <label htmlFor="reward_total_eur" className="md-label">
+                            <label htmlFor="reward_total_eur" className="flex gap-1 md-label">
                                 <Euro className="w-4 h-4" />
                                 Gesamte Prämie
                             </label>
@@ -326,7 +326,7 @@ export default function Create({ companies }: { companies: Company[] }) {
                             )}
                         </div>
                         <div>
-                            <label htmlFor="reward_offerer_percent" className="md-label">
+                            <label htmlFor="reward_offerer_percent" className="flex gap-1 md-label">
                                 <Percent className="w-4 h-4" />
                                 Dein einbehaltener Anteil
                             </label>

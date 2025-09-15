@@ -6,7 +6,8 @@ import {
   Mail,
   Handshake,
   Menu,
-  X
+  X,
+  FolderOpen
 } from 'lucide-react';
 import { useState } from 'react';
 import AppLogo from '../app-logo';
@@ -33,6 +34,7 @@ export function ModernSidebar({
 }: ModernSidebarProps) {
   const { props } = usePage();
   const unreadCount = props.unreadApplicationsCount || 0;
+  const newMatch = props.newMatch || false;
 
   const navigationItems: NavigationItem[] = [
     {
@@ -41,17 +43,22 @@ export function ModernSidebar({
       icon: LayoutGrid,
     },
     {
-      title: 'Show Offers',
+      title: 'Angebote',
       href: '/offers',
       icon: ListTodo,
     },
     {
-      title: 'Set Offer',
+      title: 'Neues Angebot',
       href: '/offers/create',
       icon: CirclePlus,
     },
     {
-      title: 'Nachrichten',
+      title: 'Meine Angebote',
+      href: '/my-offers',
+      icon: FolderOpen,
+    },
+    {
+      title: 'Anfragen',
       href: '/applications',
       icon: Mail,
       badge: unreadCount,
@@ -60,6 +67,7 @@ export function ModernSidebar({
       title: 'Matches',
       href: '/user-matches',
       icon: Handshake,
+      badge: newMatch ? 1 : 0,
     },
   ];
 
@@ -83,23 +91,24 @@ export function ModernSidebar({
       {/* Sidebar */}
       <aside className={sidebarClasses}>
         {/* Header */}
+        {isMobile && onClose && (
         <div className="md-sidebar-header">
-          <div className="flex items-center justify-between">
-            <Link href="/dashboard" className="flex items-center gap-3" prefetch>
-              <AppLogo />
-            </Link>
-            {isMobile && onClose && (
-              <button
+            <div className="flex items-center justify-between">
+                {/*}
+                <Link href="/dashboard" className="flex items-center gap-3" prefetch>
+                <AppLogo />
+                </Link>
+                */}
+                <button
                 onClick={onClose}
                 className="p-2 rounded-lg hover:bg-[var(--md-surface-container-high)] transition-colors"
                 aria-label="Sidebar schließen"
-              >
+                >
                 <X className="w-5 h-5 text-[var(--md-on-surface-variant)]" />
-              </button>
-            )}
-          </div>
+                </button>
+            </div>
         </div>
-
+        )}
         {/* Navigation */}
         <div className="md-sidebar-content">
           <nav className="space-y-2">
@@ -122,8 +131,14 @@ export function ModernSidebar({
                   <div className="relative">
                     <IconComponent className="w-5 h-5" />
                     {item.badge !== undefined && item.badge > 0 && (
-                      <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--md-error)] text-xs font-medium text-[var(--md-on-error)]">
-                        {item.badge > 99 ? '99+' : item.badge}
+                      <span className={`absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center text-xs font-medium text-[var(--md-on-error)] ${
+                        item.title === 'Matches' ? 'bg-[var(--md-error)]' : 'rounded-full bg-[var(--md-error)]'
+                      } ${
+                        item.title === 'Matches' ? 'rounded-full' : ''
+                      }`} style={item.title === 'Matches' ? {
+                        clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)'
+                      } : {}}>
+                        {item.title === 'Matches' ? '♥' : (item.badge > 99 ? '99+' : item.badge)}
                       </span>
                     )}
                   </div>

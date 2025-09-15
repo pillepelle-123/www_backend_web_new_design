@@ -20,7 +20,8 @@ class OfferController extends Controller
 
         $query = Offer::query()
             ->with(['offerer', 'company'])
-            ->where('offers.admin_status', 'active'); // Hard filter for active offers
+            ->where('offers.admin_status', 'active')
+            ->whereIn('offers.status', ['live', 'matched']); // Hard filter for active and live/matched offers
 
         // Global search
         if ($request->has('search') && !empty($request->search)) {
@@ -211,5 +212,121 @@ class OfferController extends Controller
             ->with('success', 'Offer created successfully.');
     }
 
+    public function myOffers(Request $request)
+    {
+        $perPage = 20;
+        $user = Auth::user();
+
+        $query = Offer::query()
+            ->with(['company'])
+            ->where('offerer_id', $user->id);
+
+        // Global search
+        if ($request->has('search') && !empty($request->search)) {
+            $query->search($request->search);
+        }
+
+        // Filter search
+        if ($request->has('title') && !empty($request->title)) {
+            $query->where('title', 'ilike', '%' . $request->title . '%');
+        }
+
+        if ($request->has('status') && !empty($request->status)) {
+            $query->where('status', $request->status);
+        }
+
+        // Sortierung
+        $sortField = $request->input('sort', 'created_at');
+        $sortDirection = $request->input('order', 'desc');
+
+        $query->orderBy($sortField, $sortDirection);
+
+        $offers = $query->paginate($perPage);
+
+        $offersData = $offers->map(function ($offer) {
+            return [
+                'id' => $offer->id,
+                'title' => $offer->title,
+                'company_name' => $offer->company->name,
+                'offerer_type' => $offer->offerer_type,
+                'offerer_type_label' => $offer->offerer_type == 'referrer' ? 'Werbender' : 'Beworbener',
+                'status' => $offer->status,
+                'status_label' => match($offer->status) {
+                    'draft' => 'Entwurf',
+                    'live' => 'Live',
+                    'hidden' => 'Versteckt',
+                    'matched' => 'Gematcht',
+                    'deleted' => 'Archiviert',
+                    default => ucfirst($offer->status)
+                },
+                'reward_total_cents' => $offer->reward_total_cents,
+                'reward_offerer_percent' => $offer->reward_offerer_percent,
+                'created_at' => $offer->created_at->format('Y-m-d H:i:s'),
+                'is_archived' => $offer->status === 'deleted',
+            ];
+        });
+
+        return Inertia::render('my-offers/modern-index', [
+            'offers' => $offersData,
+        ]);
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $offer = Offer::where('id', $id)
+            ->where('offerer_id', Auth::id())
+            ->firstOrFail();
+
+        $validated = $request->validate([
+            'status' => 'required|in:draft,live,hidden,deleted'
+        ]);
+
+        $offer->update(['status' => $validated['status']]);
+
+        return redirect()->route('web.offers.my-offers')
+            ->with('success', 'Status updated successfully.');
+    }
+
+    public function edit($id)
+    {
+        $offer = Offer::where('id', $id)
+            ->where('offerer_id', Auth::id())
+            ->firstOrFail();
+
+        $companies = Company::select('id', 'name')->get();
+
+        return Inertia::render('offers/edit', [
+            'offer' => $offer,
+            'companies' => $companies
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $offer = Offer::where('id', $id)
+            ->where('offerer_id', Auth::id())
+            ->firstOrFail();
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'company_id' => 'required|exists:companies,id',
+            'reward_total_euros' => 'required|numeric|min:0|max:1000',
+            'reward_offerer_percent' => 'required|numeric|min:0|max:1',
+            'offerer_type' => 'required|in:referrer,referred',
+        ]);
+
+        $offer->update([
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'company_id' => $validated['company_id'],
+            'reward_total_cents' => $validated['reward_total_euros'] * 100,
+            'reward_offerer_percent' => $validated['reward_offerer_percent'],
+            'offerer_type' => $validated['offerer_type'],
+        ]);
+
+        return redirect()->route('web.offers.my-offers')
+            ->with('success', 'Offer updated successfully.');
+    }
 
 }
