@@ -117,7 +117,7 @@ export function ModernOfferCard({ offer }: ModernOfferCardProps) {
   };
 
   return (
-    <div className="md-card md-card--elevated relative overflow-hidden group h-full flex flex-col">
+    <div id={`offer-${offer.id}`} className="md-card md-card--elevated relative overflow-hidden group h-full flex flex-col">
       {getStatusBadge()}
 
       {/* Company Logo Background */}
@@ -204,7 +204,7 @@ export function ModernOfferCard({ offer }: ModernOfferCardProps) {
         {/* Action Button */}
         <div className="flex items-center justify-between">
           <Link
-            href={`/offers/${offer.id || ''}`}
+            href={`/offers/${offer.id || ''}?return=${encodeURIComponent(window.location.search + '#offer-' + offer.id)}`}
             className="md-button md-button--filled"
           >
             Details anzeigen

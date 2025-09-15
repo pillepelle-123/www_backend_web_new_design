@@ -6,7 +6,7 @@ import { ModernOfferCard } from '@/components/modern/ModernOfferCard';
 import { ModernFilterBar } from '@/components/modern/ModernFilterBar';
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Filter, Search } from "lucide-react";
-import { useOffers } from '@/hooks/use-offers';
+import { router, usePage } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -16,80 +16,62 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 
-export default function ModernOffersIndex({ offers: initialOffers, pagination: initialPagination, search: initialSearch }) {
-  const [showFilters, setShowFilters] = useState(false);
+export default function ModernOffersIndex({ offers: initialOffers, pagination: initialPagination, filters: initialFilters }) {
+  const [showFilters, setShowFilters] = useState(initialFilters?.show_filters === '1');
   const [isApplyingFilters, setIsApplyingFilters] = useState(false);
-  const [search, setSearch] = useState({ title: "", offer_company: "" });
-  const [filters, setFilters] = useState({
-    offerer_type: "",
-    status: "",
-    average_rating_min: 0,
-    created_at_from: "",
+  const page = usePage();
+  
+  // Initialize state from URL parameters
+  const [search, setSearch] = useState({ 
+    title: initialFilters?.title || "", 
+    offer_company: initialFilters?.company || "" 
   });
-  const [sort, setSort] = useState({ field: "created_at", direction: "desc" });
+  const [filters, setFilters] = useState({
+    offerer_type: initialFilters?.type || "",
+    status: initialFilters?.status || "",
+    average_rating_min: initialFilters?.rating || 0,
+    created_at_from: initialFilters?.date_from || "",
+  });
+  const [sort, setSort] = useState({ 
+    field: initialFilters?.sort || "created_at", 
+    direction: initialFilters?.order || "desc" 
+  });
 
-  // Offers Hook für Infinite Scrolling und serverseitige Filterung
-  const {
-    offers,
-    pagination,
-    loading,
-    error,
-    loadMore,
-    updateDelayedFilters,
-    updateImmediateFilters,
-    applyFilters,
-    hasMore
-  } = useOffers(initialOffers?.data, initialPagination, initialSearch);
-
-  // Observer für Infinite Scrolling
-  const observer = useRef<IntersectionObserver | null>(null);
-  const lastOfferElementRef = useCallback((node: HTMLDivElement | null) => {
-    if (loading) return;
-    if (observer.current) observer.current.disconnect();
-
-    observer.current = new IntersectionObserver(entries => {
-      if (entries && entries.length > 0 && entries[0].isIntersecting && hasMore) {
-        loadMore();
-      }
-    }, { rootMargin: '200px' });
-
-    if (node) observer.current.observe(node);
-  }, [loading, hasMore, loadMore]);
-
-  // Verzögerte Filter-Änderungen speichern
-  useEffect(() => {
-    updateDelayedFilters({
-      title: search.title,
-      offer_company: search.offer_company,
-      created_at_from: filters.created_at_from
-    });
-  }, [search, filters.created_at_from, updateDelayedFilters]);
-
-  // Reset loading state when offers update
-  useEffect(() => {
-    setIsApplyingFilters(false);
-  }, [offers]);
+  const offers = initialOffers?.data || [];
+  const pagination = initialPagination;
 
   // Funktion zum Anwenden der Filter
-  const handleApplyFilters = async () => {
+  const handleApplyFilters = () => {
     setIsApplyingFilters(true);
-    // Update all filters before applying
-    updateDelayedFilters({
-      title: search.title,
-      offer_company: search.offer_company,
-      created_at_from: filters.created_at_from
+    
+    const params: Record<string, string> = {};
+    
+    // Add search parameters
+    if (search.title) params.title = search.title;
+    if (search.offer_company) params.company = search.offer_company;
+    
+    // Add filter parameters
+    if (filters.offerer_type) params.type = filters.offerer_type;
+    if (filters.status) params.status = filters.status;
+    if (filters.average_rating_min > 0) params.rating = filters.average_rating_min.toString();
+    if (filters.created_at_from) params.date_from = filters.created_at_from;
+    
+    // Add sort parameters
+    if (sort.field !== 'created_at') params.sort = sort.field;
+    if (sort.direction !== 'desc') params.order = sort.direction;
+    
+    // Preserve filter bar state
+    if (showFilters) params.show_filters = '1';
+    
+    router.get('/offers', params, {
+      preserveState: false,
+      onFinish: () => {
+        setIsApplyingFilters(false);
+        if (isMobile) {
+          setShowFilters(false);
+        }
+      }
     });
-    updateImmediateFilters({
-      offerer_type: filters.offerer_type,
-      status: filters.status,
-      average_rating_min: filters.average_rating_min,
-      sort_field: sort.field,
-      sort_direction: sort.direction
-    });
-    await applyFilters();
-    if (isMobile) {
-      setShowFilters(false);
-    }
   };
 
   // Mobile-Detection
@@ -100,6 +82,8 @@ export default function ModernOffersIndex({ offers: initialOffers, pagination: i
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+
 
   // Filter Button für Desktop
   const FilterButton = () => (
@@ -163,18 +147,9 @@ export default function ModernOffersIndex({ offers: initialOffers, pagination: i
         {/* Offers Grid */}
         <div className="relative">
           <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 transition-opacity duration-300 ${isApplyingFilters ? 'opacity-60' : ''}`}>
-            {offers && offers.length > 0 ? offers.map((offer, index) => {
-              // Letztes Element mit Ref für Infinite Scrolling
-              if (offers.length === index + 1) {
-                return (
-                  <div ref={lastOfferElementRef} key={`offer-${offer.id}`}>
-                    <ModernOfferCard offer={offer} />
-                  </div>
-                );
-              } else {
-                return <ModernOfferCard key={`offer-${offer.id}`} offer={offer} />;
-              }
-            }) : null}
+            {offers && offers.length > 0 ? offers.map((offer, index) => (
+              <ModernOfferCard key={`offer-${offer.id}`} offer={offer} />
+            )) : null}
           </div>
 
           {/* Filter Application Loading Overlay */}
@@ -188,44 +163,33 @@ export default function ModernOffersIndex({ offers: initialOffers, pagination: i
           )}
         </div>
 
-        {/* Loading State */}
-        {loading && (
-          <div className="flex justify-center py-8">
-            <div className="md-spinner"></div>
-          </div>
-        )}
-
-        {/* Error State */}
-        {error && (
-          <div className="text-center py-8">
-            <div className="md-empty-state">
-              <div className="text-[var(--md-error)] text-lg font-medium mb-2">
-                Fehler beim Laden
-              </div>
-              <p className="text-[var(--md-on-surface-variant)] mb-4">
-                {error}
-              </p>
-              <button
-                onClick={() => loadMore()}
-                className="md-button md-button--filled"
-              >
-                Erneut versuchen
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* End of List */}
-        {!hasMore && offers.length > 0 && (
-          <div className="text-center py-8">
-            <div className="text-[var(--md-on-surface-variant)]">
-              Keine weiteren Angebote verfügbar
-            </div>
+        {/* Pagination */}
+        {pagination && pagination.last_page > 1 && (
+          <div className="flex justify-center mt-8">
+            <nav className="flex items-center gap-2">
+              {Array.from({ length: pagination.last_page }, (_, i) => i + 1).map(pageNum => (
+                <button
+                  key={pageNum}
+                  onClick={() => {
+                    const params = new URLSearchParams(window.location.search);
+                    params.set('page', pageNum.toString());
+                    router.get(`/offers?${params.toString()}`);
+                  }}
+                  className={`md-button ${
+                    pageNum === pagination.current_page
+                      ? 'md-button--filled'
+                      : 'md-button--outlined'
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              ))}
+            </nav>
           </div>
         )}
 
         {/* Empty State */}
-        {!loading && offers.length === 0 && (
+        {offers.length === 0 && (
           <div className="text-center py-16">
             <div className="md-empty-state">
               <Search className="md-empty-state-icon" />

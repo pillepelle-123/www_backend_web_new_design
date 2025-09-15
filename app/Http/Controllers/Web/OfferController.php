@@ -20,27 +20,27 @@ class OfferController extends Controller
 
         $query = Offer::query()
             ->with(['offerer', 'company'])
-            ->active(); // Hard filter for active offers
+            ->where('offers.admin_status', 'active'); // Hard filter for active offers
 
         // Global search
         if ($request->has('search') && !empty($request->search)) {
             $query->search($request->search);
         }
 
-        // Suche (case-insensitive)
+        // Filter search (case-insensitive)
         if ($request->has('title') && !empty($request->title)) {
             $query->where('title', 'ilike', '%' . $request->title . '%');
         }
 
-        if ($request->has('offer_company') && !empty($request->offer_company)) {
+        if ($request->has('company') && !empty($request->company)) {
             $query->whereHas('company', function($q) use ($request) {
-                $q->where('name', 'ilike', '%' . $request->offer_company . '%');
+                $q->where('name', 'ilike', '%' . $request->company . '%');
             });
         }
 
         // Filter
-        if ($request->has('offerer_type') && !empty($request->offerer_type)) {
-            $type = $request->offerer_type === 'Werbender' ? 'referrer' : 'referred';
+        if ($request->has('type') && !empty($request->type)) {
+            $type = $request->type === 'Werbender' ? 'referrer' : 'referred';
             $query->where('offerer_type', $type);
         }
 
@@ -48,23 +48,24 @@ class OfferController extends Controller
             $query->where('status', $request->status);
         }
 
-        if ($request->has('average_rating_min') && $request->average_rating_min > 0) {
+        if ($request->has('rating') && $request->rating > 0) {
             $query->whereHas('offerer', function($q) use ($request) {
-                $q->where('average_rating', '>=', $request->average_rating_min);
+                $q->where('average_rating', '>=', $request->rating);
             });
         }
 
-        if ($request->has('created_at_from') && !empty($request->created_at_from)) {
-            $query->whereDate('created_at', '>=', $request->created_at_from);
+        if ($request->has('date_from') && !empty($request->date_from)) {
+            $query->whereDate('created_at', '>=', $request->date_from);
         }
 
         // Sortierung
-        $sortField = $request->input('sort_field', 'created_at');
-        $sortDirection = $request->input('sort_direction', 'desc');
+        $sortField = $request->input('sort', 'created_at');
+        $sortDirection = $request->input('order', 'desc');
 
         // Mapping der Frontend-Sortierfelder zu Datenbankfeldern
         $sortFieldMap = [
             'created_at' => 'created_at',
+            'title' => 'title',
             'reward_total_cents' => 'reward_total_cents',
             'reward_offerer_percent' => 'reward_offerer_percent',
             'average_rating' => 'users.average_rating'
@@ -75,11 +76,19 @@ class OfferController extends Controller
 
         // Spezielle Sortierung für Felder aus verknüpften Tabellen
         if ($dbSortField === 'users.average_rating') {
-            $query->join('users', 'offers.user_id', '=', 'users.id')
-                  ->select('offers.*');
+            $query->join('users', 'offers.offerer_id', '=', 'users.id')
+                  ->select('offers.*')
+                  ->where('offers.admin_status', 'active'); // Re-apply admin_status filter after join
         }
 
-        $query->orderBy($dbSortField, $sortDirection);
+        // Handle NULL values in sorting and add secondary sort for consistency
+        if ($dbSortField === 'created_at') {
+            $query->orderByRaw("created_at {$sortDirection} NULLS LAST")
+                  ->orderBy('id', $sortDirection);
+        } else {
+            $query->orderBy($dbSortField, $sortDirection)
+                  ->orderBy('id', $sortDirection);
+        }
 
         // Paginierung
         $offers = $query->paginate($perPage);
@@ -114,10 +123,21 @@ class OfferController extends Controller
                 'total' => $offers->total(),
             ],
             'search' => $request->input('search', ''),
+            'filters' => [
+                'title' => $request->input('title', ''),
+                'company' => $request->input('company', ''),
+                'type' => $request->input('type', ''),
+                'status' => $request->input('status', ''),
+                'rating' => $request->input('rating', 0),
+                'date_from' => $request->input('date_from', ''),
+                'sort' => $request->input('sort', 'created_at'),
+                'order' => $request->input('order', 'desc'),
+                'show_filters' => $request->input('show_filters', ''),
+            ],
         ]);
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $offer = Offer::with(['offerer', 'company'])->findOrFail($id);
         $user = Auth::user();
@@ -149,6 +169,7 @@ class OfferController extends Controller
 
         return Inertia::render('offers/show', [
             'offer' => $offerData,
+            'returnUrl' => $request->input('return', ''),
         ]);
     }
 

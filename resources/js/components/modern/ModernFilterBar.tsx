@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { X, Search, Filter, SortAsc, SortDesc } from 'lucide-react';
+import { router } from '@inertiajs/react';
 
 interface SearchState {
   title: string;
@@ -77,23 +78,10 @@ export function ModernFilterBar({
   };
 
   const clearFilters = () => {
-    const clearedSearch = { title: "", offer_company: "" };
-    const clearedFilters = {
-      offerer_type: "",
-      status: "",
-      average_rating_min: 0,
-      created_at_from: "",
-    };
-    const clearedSort = { field: "created_at", direction: "desc" };
-
-    setLocalSearch(clearedSearch);
-    setLocalFilters(clearedFilters);
-    setLocalSort(clearedSort);
-    setSearch(clearedSearch);
-    setFilters(clearedFilters);
-    setSort(clearedSort);
-    // Apply the cleared state immediately
-    onApplyFilters();
+    // Navigate to base URL without any parameters
+    router.get('/offers', {}, {
+      preserveState: false
+    });
   };
 
   const hasActiveFilters = () => {

@@ -18,7 +18,9 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Show({ offer }: { offer: Offer }) {
+export default function Show({ offer, returnUrl }: { offer: Offer, returnUrl?: string }) {
+  // Use returnUrl from props, fallback to empty string
+  const finalReturnUrl = returnUrl || '';
   // Tooltips
   const [showRatingTooltip, setShowRatingTooltip] = useState(false);
   const [showTypeTooltip, setShowTypeTooltip] = useState(false);
@@ -169,7 +171,7 @@ export default function Show({ offer }: { offer: Offer }) {
       {/* Actions */}
       <div className="flex justify-between items-center">
         <Link
-          href="/offers"
+          href={`/offers${finalReturnUrl}`}
           className="md-button md-button--outlined"
         >
           Zurück zur Übersicht

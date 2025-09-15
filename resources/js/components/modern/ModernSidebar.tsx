@@ -108,7 +108,8 @@ export function ModernSidebar({
             </div>
 
             {navigationItems.map((item) => {
-              const isActive = item.href === usePage().url;
+              const currentUrl = usePage().url;
+              const isActive = currentUrl === item.href || (item.href === '/offers' && currentUrl.startsWith('/offers'));
               const IconComponent = item.icon;
 
               return (
