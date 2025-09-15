@@ -4,6 +4,13 @@ import { Link, usePage } from '@inertiajs/react';
 
 export function NavMain({ items = [] }: { items: NavItem[] }) {
     const page = usePage();
+    
+    const isActive = (itemHref: string) => {
+        const currentPath = new URL(page.url, window.location.origin).pathname;
+        console.log('Checking:', itemHref, 'vs', currentPath, '=', itemHref === currentPath);
+        return itemHref === currentPath;
+    };
+    
     return (
         <SidebarGroup>
             <SidebarGroupLabel>Menü</SidebarGroupLabel>
@@ -14,7 +21,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                             <SidebarMenuButton
                                 // className="hover:text-gray-300"
                                 asChild
-                                isActive={item.href === page.url}
+                                isActive={isActive(item.href) ? true : false}
                                 tooltip={{ children: item.title }}
                             >
                                 <Link href={item.href} prefetch >

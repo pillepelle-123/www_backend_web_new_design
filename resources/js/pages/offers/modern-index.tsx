@@ -64,7 +64,8 @@ export default function ModernOffersIndex({ offers: initialOffers, pagination: i
     if (showFilters) params.show_filters = '1';
     
     router.get('/offers', params, {
-      preserveState: false,
+      preserveState: true,
+      preserveScroll: true,
       onFinish: () => {
         setIsApplyingFilters(false);
         if (isMobile) {
@@ -81,6 +82,16 @@ export default function ModernOffersIndex({ offers: initialOffers, pagination: i
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Hide Inertia progress bar on this page
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = '#nprogress { display: none !important; }';
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
   }, []);
 
 
@@ -173,7 +184,10 @@ export default function ModernOffersIndex({ offers: initialOffers, pagination: i
                   onClick={() => {
                     const params = new URLSearchParams(window.location.search);
                     params.set('page', pageNum.toString());
-                    router.get(`/offers?${params.toString()}`);
+                    router.get(`/offers?${params.toString()}`, {}, {
+                      preserveState: true,
+                      preserveScroll: false
+                    });
                   }}
                   className={`md-button ${
                     pageNum === pagination.current_page
