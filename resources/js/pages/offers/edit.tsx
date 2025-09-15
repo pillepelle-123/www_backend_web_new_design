@@ -42,7 +42,7 @@ export default function EditOffer({ offer, companies }: { offer: Offer; companie
     });
 
     const [selectedCompany, setSelectedCompany] = useState<{ value: string; label: string } | null>(
-        companies.find(c => c.id === offer.company_id) 
+        companies.find(c => c.id === offer.company_id)
             ? { value: offer.company_id.toString(), label: companies.find(c => c.id === offer.company_id)!.name }
             : null
     );
@@ -69,12 +69,12 @@ export default function EditOffer({ offer, companies }: { offer: Offer; companie
     };
 
     const selectClassNames = {
-        control: () => 'mt-1 rounded-md bg-[var(--md-surface-container)] border-[var(--md-outline-variant)] shadow-none min-h-[36px]',
+        control: () => 'mt-1 rounded-md bg-[var(--md-surface-container)] border-[var(--md-outline-variant)] shadow-none min-h-[36px] text-[var(--md-on-surface)]',
         menu: () => 'rounded-md bg-[var(--md-surface-container)] mt-1 shadow-lg border border-[var(--md-outline-variant)]',
         option: ({ isFocused, isSelected }) =>
-          `cursor-pointer px-4 py-2 ${isSelected ? 'bg-[var(--md-primary-container)] text-[var(--md-on-primary-container)]' : isFocused ? 'bg-[var(--md-surface-container-high)]' : ''}`,
-        singleValue: () => 'text-[var(--md-on-surface)]',
-        input: () => 'text-[var(--md-on-surface)]',
+          `cursor-pointer px-4 py-2 text-[var(--md-on-surface)] ${isSelected ? 'bg-[var(--md-primary-container)] text-[var(--md-on-primary-container)]' : isFocused ? 'bg-[var(--md-surface-container-high)]' : ''}`,
+        singleValue: () => '!text-[var(--md-on-surface)] ',
+        input: () => 'text-[var(--md-on-surface)] ',
         placeholder: () => 'text-[var(--md-on-surface-variant)]',
     };
 
@@ -216,6 +216,19 @@ export default function EditOffer({ offer, companies }: { offer: Offer; companie
                             classNamePrefix="select"
                             isClearable
                             required
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    color: '#000000 !important',
+                                    backgroundColor: 'var(--md-surface-container)',
+                                    //border: '1px solid orange !important',
+                                    borderRadius: 'var(--radius-lg)',
+                                    boxShadow: 'none',
+                                    '&:hover': {
+                                        borderColor: 'var(--md-outline)',
+                                    },
+                                })
+                            }}
                         />
                         {errors.company_id && (
                             <p className="mt-1 text-sm text-[var(--md-error)]">{errors.company_id}</p>
