@@ -1,9 +1,9 @@
-import AppLayout from '@/layouts/app-layout';
+import ModernLayout from '@/layouts/ModernLayout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm, router } from '@inertiajs/react';
 import Select from 'react-select';
 import { useState, /* useEffect */ } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Building2, Euro, Percent, UserRound, UsersRound, FileText } from 'lucide-react';
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -88,13 +88,13 @@ export default function Create({ companies }: { companies: Company[] }) {
     // };
 
     const selectClassNames = {
-        control: () => 'mt-1 rounded-md bg-zinc-100 dark:bg-zinc-800 border-none shadow-none min-h-[36px]',
-        menu: () => 'rounded-md bg-white dark:bg-zinc-800 mt-1 shadow-lg',
+        control: () => 'mt-1 rounded-md bg-[var(--md-surface-container)] border-[var(--md-outline-variant)] shadow-none min-h-[36px]',
+        menu: () => 'rounded-md bg-[var(--md-surface-container)] mt-1 shadow-lg border border-[var(--md-outline-variant)]',
         option: ({ isFocused, isSelected }) =>
-          `cursor-pointer px-4 py-2 ${isSelected ? 'bg-sky-100 dark:bg-zinc-700 text-sky-900' : isFocused ? 'bg-zinc-200 dark:bg-zinc-700' : ''}`,
-        singleValue: () => 'text-gray-900 dark:text-gray-100',
-        input: () => 'text-gray-900 dark:text-gray-100',
-        placeholder: () => 'text-gray-400 dark:text-gray-400',
+          `cursor-pointer px-4 py-2 ${isSelected ? 'bg-[var(--md-primary-container)] text-[var(--md-on-primary-container)]' : isFocused ? 'bg-[var(--md-surface-container-high)]' : ''}`,
+        singleValue: () => 'text-[var(--md-on-surface)]',
+        input: () => 'text-[var(--md-on-surface)]',
+        placeholder: () => 'text-[var(--md-on-surface-variant)]',
       };
 
     // const selectStyles = {
@@ -139,244 +139,248 @@ export default function Create({ companies }: { companies: Company[] }) {
     // };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <ModernLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Offer" />
-            <div className="p-5">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                        {/* <div className="p-1"> */}
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                <div>
-                                    { /* ########## OFFERED BY TYPE ########## */ }
-                                    <label className="block text-sm font-medium mb-2">
-                                        Du bist...
-                                    </label>
-                                    <div className="space-y-2">
-                                        <div
-                                            className={`relative flex cursor-pointer rounded-lg border bg-white dark:bg-zinc-800 px-5 py-4 shadow-sm focus:outline-none ${
-                                                data.offerer_type === 'referrer'
-                                                    ? 'border-[var(--accent)] ring-2 ring-[var(--accent)]'
-                                                    : 'border-zinc-800 hover:border-gray-300 transition-all duration-300'
-                                            }`}
-                                            onClick={() => setData('offerer_type', 'referrer')}
-                                            tabIndex={0}
-                                            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setData('offerer_type', 'referrer') }}
-                                            role="radio"
-                                            aria-checked={data.offerer_type === 'referrer'}
-                                        >
-                                            <span className="flex h-5 items-center">
-                                                <span
-                                                    className={`inline-block h-4 w-4 rounded-full border-2 ${
-                                                        data.offerer_type === 'referrer'
-                                                            ? 'border-[var(--accent)] bg-[var(--accent)]'
-                                                            : 'border-gray-300 bg-white'
-                                                    }`}
-                                                />
-                                            </span>
-                                            <span className="ml-3 flex flex-col">
-                                                <span className="block text-sm font-medium">
-                                                    Werbender
-                                                </span>
-                                                <span className="block text-xs">
-                                                    Du hast einen Account und möchtest jemanden werben.
-                                                </span>
-                                            </span>
-                                        </div>
-                                        <div
-                                            className={`relative flex cursor-pointer rounded-lg border bg-white dark:bg-zinc-800 px-5 py-4 shadow-sm focus:outline-none ${
-                                                data.offerer_type === 'referred'
-                                                    ? 'border-[var(--accent)] ring-2 ring-[var(--accent)]'
-                                                    : 'border-zinc-800 hover:border-gray-300 transition-all duration-300'
-                                            }`}
-                                            onClick={() => setData('offerer_type', 'referred')}
-                                            tabIndex={0}
-                                            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setData('offerer_type', 'referred') }}
-                                            role="radio"
-                                            aria-checked={data.offerer_type === 'referred'}
-                                        >
-                                            <span className="flex h-5 items-center">
-                                                <span
-                                                    className={`inline-block h-4 w-4 rounded-full border-2 ${
-                                                        data.offerer_type === 'referred'
-                                                            ? 'border-[var(--accent)] bg-[var(--accent)]'
-                                                            : 'border-gray-300 bg-white'
-                                                    }`}
-                                                />
-                                            </span>
-                                            <span className="ml-3 flex flex-col">
-                                                <span className="block text-sm font-medium">
-                                                    Beworbener
-                                                </span>
-                                                <span className="block text-xs">
-                                                    Du hast noch keinen Account und möchtest von jemandem beworben werden.
-                                                </span>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    {errors.offerer_type && (
-                                        <p className="mt-1 text-sm text-red-600">{errors.offerer_type}</p>
-                                    )}
-                                </div>
-                                <div>
-                                    { /* ########## TITLE ########## */ }
-                                    <label htmlFor="title" className="block text-sm font-medium">
-                                        Titel
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="title"
-                                        value={data.title}
-                                        onChange={e => setData('title', e.target.value)}
-                                        className="mt-1 block w-full rounded-md border-gray-900 shadow-sm bg-zinc-100 dark:bg-zinc-800 h-9 p-2 autofill:!bg-gray-800 dark:autofill:!bg-zinc-800"
-                                        required
-                                        placeholder="Unter welchem Titel soll dein Angebot angezeigt werden?"
-                                    />
-                                    {errors.title && (
-                                        <p className="mt-1 text-sm text-red-600">{errors.title}</p>
-                                    )}
-                                </div>
-                                <div>
-                                    { /* ########## DESCRIPTION ########## */ }
-                                    <label htmlFor="description" className="block text-sm font-medium">
-                                        Beschreibung
-                                    </label>
-                                    <textarea
-                                        id="description"
-                                        value={data.description}
-                                        onChange={e => setData('description', e.target.value)}
-                                        rows={4}
-                                        className="mt-1 block w-full rounded-md shadow-sm bg-zinc-100 dark:bg-zinc-800 dark:border-gray-600 p-2"
-                                        required
-                                        placeholder="Beschreibe dein Angebot"
-                                    />
-                                    {errors.description && (
-                                        <p className="mt-1 text-sm text-red-600">{errors.description}</p>
-                                    )}
-                                </div>
-                                <div>
-                                    { /* ########## COMPANY ########## */ }
-                                    <label htmlFor="company" className="block text-sm font-medium">
-                                        Anbieter
-                                    </label>
-                                    <Select
-                                        id="company"
-                                        value={selectedCompany}
-                                        onChange={(option) => {
-                                            setSelectedCompany(option);
-                                            setData('company_id', option?.value || '');
-                                        }}
-                                        options={companyOptions}
-                                        classNames= {selectClassNames} // 'mt-1'
-                                        classNamePrefix="select"
-                                        isClearable
-                                        required
-                                        // styles={selectStyles}
-                                    />
-                                    {errors.company_id && (
-                                        <p className="mt-1 text-sm text-red-600">{errors.company_id}</p>
-                                    )}
-                                </div>
-                                <div>
-                                    { /* ########## REWARD ########## */ }
-                                    <label htmlFor="reward_total_eur" className="block text-sm font-medium">
-                                        Reward
-                                    </label>
-                                    <div className="relative mt-1 flex rounded-md shadow-sm">
-                                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 border-r border-gray-300 dark:border-zinc-600 pr-2 w-14">
-                                            <span className="text-zinc-400 sm:text-sm">EUR</span>
-                                        </div>
-                                        <input
-                                            type="number"
-                                            id="reward_total_eur"
-                                            min="0"
-                                            max="100000"
-                                            step="0.01"
-                                            value={data.reward_total_eur}
-                                            onChange={e => setData('reward_total_eur', parseFloat(e.target.value) || 0)}
-                                            className="block w-full rounded-md border-gray-300 pl-16 pr-10 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-100 dark:bg-zinc-800 dark:text-gray-300 h-9"
-                                            required
-                                            placeholder="0.00"
-                                        />
-                                        <div className="absolute right-1 top-1 flex flex-col h-7 justify-center">
-                                            <button
-                                                type="button"
-                                                tabIndex={-1}
-                                                className="bg-zinc-100 dark:bg-zinc-800 text-gray-900 dark:text-gray-300 rounded-t w-7 h-3 flex items-center justify-center"
-                                                onMouseDown={e => { e.preventDefault(); setData('reward_total_eur', Math.round((data.reward_total_eur + 1) * 100) / 100); }}
-                                            >
-                                            <ChevronUp className="hover:text-[var(--accent)] dark:hover:text-gray-400 flex-none w-5 h-5 mr-1" />
-                                            </button>
-                                            <button
-                                                type="button"
-                                                tabIndex={-1}
-                                                className="bg-zinc-100 dark:bg-zinc-800 text-gray-900 dark:text-gray-300 rounded-t w-7 h-3 flex items-center justify-center"
-                                                onMouseDown={e => { e.preventDefault(); setData('reward_total_eur', Math.max(0, Math.round((data.reward_total_eur - 1) * 100) / 100)); }}
-                                            >
-                                            <ChevronDown className="hover:text-[var(--accent)] dark:hover:text-gray-400 flex-none w-5 h-5 mr-1" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                    {errors.reward_total_eur && (
-                                        <p className="mt-1 text-sm text-red-600">{errors.reward_total_eur}</p>
-                                    )}
-                                </div>
-                                <div>
-                                    { /* ########## REWARD OFFERER PERCENT ########## */ }
-                                    <label htmlFor="reward_offerer_percent" className="block text-sm font-medium">
-                                        Dein einbehaltener Anteil
-                                    </label>
-                                    <div className="relative mt-1 flex rounded-md shadow-sm">
-                                        { /* ##### % Zeichen ##### */ }
-                                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 border-r border-gray-300 dark:border-zinc-600 pr-2 w-14">
-                                            <span className="text-zinc-400 sm:text-sm">%</span>
-                                        </div>
-                                        <input
-                                            type="number"
-                                            id="reward_offerer_percent"
-                                            min="0"
-                                            max="100"
-                                            step="1"
-                                            value={data.reward_offerer_percent}
-                                            onChange={e => setData('reward_offerer_percent', parseInt(e.target.value) || 0)}
-                                            className="block w-full rounded-md pl-16 pr-10 shadow-sm bg-zinc-100 dark:bg-zinc-800 dark:text-gray-300 h-9"
-                                            required
-                                            placeholder="z.B. 20"
-                                        />
-                                        <div className="absolute right-1 top-1 flex flex-col h-7 justify-center">
-                                            <button
-                                                type="button"
-                                                tabIndex={-1}
-                                                className="bg-zinc-100 dark:bg-zinc-800 text-gray-900 dark:text-zinc-300 rounded-t w-7 h-3 flex items-center justify-center"
-                                                onMouseDown={e => { e.preventDefault(); setData('reward_offerer_percent', Math.min(100, data.reward_offerer_percent + 1)); }}
-                                            >
-                                            <ChevronUp className="hover:text-[var(--accent)] dark:hover:text-gray-400 flex-none w-5 h-5 mr-1" />
-                                            </button>
-                                            <button
-                                                type="button"
-                                                tabIndex={-1}
-                                                className="bg-zinc-100 dark:bg-zinc-800 text-gray-900 dark:text-gray-300 rounded-b w-7 h-3 flex items-center justify-center"
-                                                onMouseDown={e => { e.preventDefault(); setData('reward_offerer_percent', Math.max(0, data.reward_offerer_percent - 1)); }}
-                                            >
-                                            <ChevronDown className="hover:text-[var(--accent)] dark:hover:text-gray-400 flex-none w-5 h-5 mr-1" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                    {errors.reward_offerer_percent && (
-                                        <p className="mt-1 text-sm text-red-600">{errors.reward_offerer_percent}</p>
-                                    )}
-                                </div>
 
-                                <div className="flex justify-end">
+            {/* Header */}
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold text-[var(--md-on-surface)]">
+                    Neues Angebot erstellen
+                </h1>
+            </div>
+
+            {/* Form */}
+            <div className="md-card md-card--elevated p-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                        <div>
+                            <label className="md-label">
+                                <UserRound className="w-4 h-4" />
+                                Du bist...
+                            </label>
+                            <div className="space-y-2">
+                                <div
+                                    className={`relative flex cursor-pointer rounded-lg border bg-[var(--md-surface-container)] px-5 py-4 shadow-sm focus:outline-none transition-all duration-300 ${
+                                        data.offerer_type === 'referrer'
+                                            ? 'border-[var(--md-primary)] ring-2 ring-[var(--md-primary)]'
+                                            : 'border-[var(--md-outline-variant)] hover:border-[var(--md-outline)]'
+                                    }`}
+                                    onClick={() => setData('offerer_type', 'referrer')}
+                                    tabIndex={0}
+                                    onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setData('offerer_type', 'referrer') }}
+                                    role="radio"
+                                    aria-checked={data.offerer_type === 'referrer'}
+                                >
+                                    <span className="flex h-5 items-center">
+                                        <span
+                                            className={`inline-block h-4 w-4 rounded-full border-2 ${
+                                                data.offerer_type === 'referrer'
+                                                    ? 'border-[var(--md-primary)] bg-[var(--md-primary)]'
+                                                    : 'border-[var(--md-outline-variant)] bg-[var(--md-surface)]'
+                                            }`}
+                                        />
+                                    </span>
+                                    <span className="ml-3 flex flex-col">
+                                        <span className="block text-sm font-medium text-[var(--md-on-surface)]">
+                                            Werbender
+                                        </span>
+                                        <span className="block text-xs text-[var(--md-on-surface-variant)]">
+                                            Du hast einen Account und möchtest jemanden werben.
+                                        </span>
+                                    </span>
+                                </div>
+                                <div
+                                    className={`relative flex cursor-pointer rounded-lg border bg-[var(--md-surface-container)] px-5 py-4 shadow-sm focus:outline-none transition-all duration-300 ${
+                                        data.offerer_type === 'referred'
+                                            ? 'border-[var(--md-primary)] ring-2 ring-[var(--md-primary)]'
+                                            : 'border-[var(--md-outline-variant)] hover:border-[var(--md-outline)]'
+                                    }`}
+                                    onClick={() => setData('offerer_type', 'referred')}
+                                    tabIndex={0}
+                                    onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setData('offerer_type', 'referred') }}
+                                    role="radio"
+                                    aria-checked={data.offerer_type === 'referred'}
+                                >
+                                    <span className="flex h-5 items-center">
+                                        <span
+                                            className={`inline-block h-4 w-4 rounded-full border-2 ${
+                                                data.offerer_type === 'referred'
+                                                    ? 'border-[var(--md-primary)] bg-[var(--md-primary)]'
+                                                    : 'border-[var(--md-outline-variant)] bg-[var(--md-surface)]'
+                                            }`}
+                                        />
+                                    </span>
+                                    <span className="ml-3 flex flex-col">
+                                        <span className="block text-sm font-medium text-[var(--md-on-surface)]">
+                                            Beworbener
+                                        </span>
+                                        <span className="block text-xs text-[var(--md-on-surface-variant)]">
+                                            Du hast noch keinen Account und möchtest von jemandem beworben werden.
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                            {errors.offerer_type && (
+                                <p className="mt-1 text-sm text-[var(--md-error)]">{errors.offerer_type}</p>
+                            )}
+                        </div>
+                        <div>
+                            <label htmlFor="title" className="md-label">
+                                <FileText className="w-4 h-4" />
+                                Titel
+                            </label>
+                            <input
+                                type="text"
+                                id="title"
+                                value={data.title}
+                                onChange={e => setData('title', e.target.value)}
+                                className="md-input"
+                                required
+                                placeholder="Unter welchem Titel soll dein Angebot angezeigt werden?"
+                            />
+                            {errors.title && (
+                                <p className="mt-1 text-sm text-[var(--md-error)]">{errors.title}</p>
+                            )}
+                        </div>
+                        <div>
+                            <label htmlFor="description" className="md-label">
+                                <FileText className="w-4 h-4" />
+                                Beschreibung
+                            </label>
+                            <textarea
+                                id="description"
+                                value={data.description}
+                                onChange={e => setData('description', e.target.value)}
+                                rows={4}
+                                className="md-input"
+                                required
+                                placeholder="Beschreibe dein Angebot"
+                            />
+                            {errors.description && (
+                                <p className="mt-1 text-sm text-[var(--md-error)]">{errors.description}</p>
+                            )}
+                        </div>
+                        <div>
+                            <label htmlFor="company" className="md-label">
+                                <Building2 className="w-4 h-4" />
+                                Anbieter
+                            </label>
+                            <Select
+                                id="company"
+                                value={selectedCompany}
+                                onChange={(option) => {
+                                    setSelectedCompany(option);
+                                    setData('company_id', option?.value || '');
+                                }}
+                                options={companyOptions}
+                                classNames={selectClassNames}
+                                classNamePrefix="select"
+                                isClearable
+                                required
+                            />
+                            {errors.company_id && (
+                                <p className="mt-1 text-sm text-[var(--md-error)]">{errors.company_id}</p>
+                            )}
+                        </div>
+                        <div>
+                            <label htmlFor="reward_total_eur" className="md-label">
+                                <Euro className="w-4 h-4" />
+                                Gesamte Prämie
+                            </label>
+                            <div className="relative mt-1 flex rounded-md shadow-sm">
+                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 border-r border-[var(--md-outline-variant)] pr-2 w-14">
+                                    <span className="text-[var(--md-on-surface-variant)] sm:text-sm">EUR</span>
+                                </div>
+                                <input
+                                    type="number"
+                                    id="reward_total_eur"
+                                    min="0"
+                                    max="100000"
+                                    step="0.01"
+                                    value={data.reward_total_eur}
+                                    onChange={e => setData('reward_total_eur', parseFloat(e.target.value) || 0)}
+                                    className="md-input pl-16 pr-10"
+                                    required
+                                    placeholder="0.00"
+                                />
+                                <div className="absolute right-1 top-1 flex flex-col h-7 justify-center">
                                     <button
-                                        type="submit"
-                                        disabled={processing}
-                                        className="inline-flex justify-center rounded-md border border-transparent bg-sky-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 cursor-pointer"
+                                        type="button"
+                                        tabIndex={-1}
+                                        className="bg-[var(--md-surface-container)] text-[var(--md-on-surface)] rounded-t w-7 h-3 flex items-center justify-center hover:bg-[var(--md-surface-container-high)]"
+                                        onMouseDown={e => { e.preventDefault(); setData('reward_total_eur', Math.round((data.reward_total_eur + 1) * 100) / 100); }}
                                     >
-                                        {processing ? 'Creating...' : 'Create Offer'}
+                                        <ChevronUp className="w-3 h-3" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        tabIndex={-1}
+                                        className="bg-[var(--md-surface-container)] text-[var(--md-on-surface)] rounded-b w-7 h-3 flex items-center justify-center hover:bg-[var(--md-surface-container-high)]"
+                                        onMouseDown={e => { e.preventDefault(); setData('reward_total_eur', Math.max(0, Math.round((data.reward_total_eur - 1) * 100) / 100)); }}
+                                    >
+                                        <ChevronDown className="w-3 h-3" />
                                     </button>
                                 </div>
-                            </form>
+                            </div>
+                            {errors.reward_total_eur && (
+                                <p className="mt-1 text-sm text-[var(--md-error)]">{errors.reward_total_eur}</p>
+                            )}
+                        </div>
+                        <div>
+                            <label htmlFor="reward_offerer_percent" className="md-label">
+                                <Percent className="w-4 h-4" />
+                                Dein einbehaltener Anteil
+                            </label>
+                            <div className="relative mt-1 flex rounded-md shadow-sm">
+                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 border-r border-[var(--md-outline-variant)] pr-2 w-14">
+                                    <span className="text-[var(--md-on-surface-variant)] sm:text-sm">%</span>
+                                </div>
+                                <input
+                                    type="number"
+                                    id="reward_offerer_percent"
+                                    min="0"
+                                    max="100"
+                                    step="1"
+                                    value={data.reward_offerer_percent}
+                                    onChange={e => setData('reward_offerer_percent', parseInt(e.target.value) || 0)}
+                                    className="md-input pl-16 pr-10"
+                                    required
+                                    placeholder="z.B. 20"
+                                />
+                                <div className="absolute right-1 top-1 flex flex-col h-7 justify-center">
+                                    <button
+                                        type="button"
+                                        tabIndex={-1}
+                                        className="bg-[var(--md-surface-container)] text-[var(--md-on-surface)] rounded-t w-7 h-3 flex items-center justify-center hover:bg-[var(--md-surface-container-high)]"
+                                        onMouseDown={e => { e.preventDefault(); setData('reward_offerer_percent', Math.min(100, data.reward_offerer_percent + 1)); }}
+                                    >
+                                        <ChevronUp className="w-3 h-3" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        tabIndex={-1}
+                                        className="bg-[var(--md-surface-container)] text-[var(--md-on-surface)] rounded-b w-7 h-3 flex items-center justify-center hover:bg-[var(--md-surface-container-high)]"
+                                        onMouseDown={e => { e.preventDefault(); setData('reward_offerer_percent', Math.max(0, data.reward_offerer_percent - 1)); }}
+                                    >
+                                        <ChevronDown className="w-3 h-3" />
+                                    </button>
+                                </div>
+                            </div>
+                            {errors.reward_offerer_percent && (
+                                <p className="mt-1 text-sm text-[var(--md-error)]">{errors.reward_offerer_percent}</p>
+                            )}
+                        </div>
+
+                    <div className="flex justify-end">
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            className="md-button md-button--filled"
+                        >
+                            {processing ? 'Creating...' : 'Create Offer'}
+                        </button>
                     </div>
+                </form>
             </div>
-        </AppLayout>
+        </ModernLayout>
     );
 }

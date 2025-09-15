@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { Offer } from '@/pages/offers/index';
+import { Offer } from '@/types/offer';
 import {
   UserRound,
   UsersRound,

@@ -1,7 +1,7 @@
-import AppLayout from '@/layouts/app-layout';
+import ModernLayout from '@/layouts/ModernLayout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { Star } from 'lucide-react';
+import { Star, Building2, UserRound, Calendar, MessageSquare } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -42,79 +42,82 @@ export default function Show({ rating }: { rating: RatingData }) {
     return Array.from({ length: 5 }, (_, index) => {
       const starNumber = index + 1;
       const isActive = starNumber <= score;
-      
+
       return (
         <Star
           key={starNumber}
-          className={`w-6 h-6 ${isActive ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+          className={`w-6 h-6 ${isActive ? 'text-[var(--md-tertiary)] fill-current' : 'text-[var(--md-outline-variant)]'}`}
         />
       );
     });
   };
 
   return (
-    <AppLayout breadcrumbs={breadcrumbs}>
+    <ModernLayout breadcrumbs={breadcrumbs}>
       <Head title="Bewertung ansehen" />
-      <div className="container mx-auto p-4">
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-white dark:bg-white/10 rounded-xl shadow-lg overflow-hidden">
-            <div className="p-6">
-              <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
-                Ihre Bewertung
-              </h1>
 
-              <div className="mb-6">
-                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
-                  <h3 className="font-medium text-gray-900 dark:text-white">{rating.title}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{rating.company_name}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
-                    Sie haben bewertet: <span className="font-medium">{rating.partner_name}</span>
-                  </p>
-                </div>
-              </div>
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-[var(--md-on-surface)]">
+          Ihre Bewertung
+        </h1>
+      </div>
 
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Bewertung
-                  </label>
-                  <div className="flex items-center gap-1">
-                    {renderStars(rating.score)}
-                    <span className="ml-2 text-lg font-medium">{rating.score}/5</span>
-                  </div>
-                </div>
-
-                {rating.comment && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Kommentar
-                    </label>
-                    <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
-                      <p className="text-gray-600 dark:text-gray-300">{rating.comment}</p>
-                    </div>
-                  </div>
-                )}
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Bewertung abgegeben am
-                  </label>
-                  <p className="text-gray-600 dark:text-gray-300">{formatDate(rating.created_at)}</p>
-                </div>
-              </div>
-
-              <div className="flex justify-between pt-6">
-                <Link
-                  href={route('web.user-matches.show', rating.user_match_id)}
-                  className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200"
-                >
-                  Zurück zum Match
-                </Link>
-              </div>
-            </div>
-          </div>
+      {/* Match Info */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div>
+          <p className="text-sm text-[var(--md-on-surface-variant)] mb-1">Angebot</p>
+          <p className="font-medium text-[var(--md-on-surface)]">{rating.title}</p>
+        </div>
+        <div>
+          <p className="text-sm text-[var(--md-on-surface-variant)] mb-1">Unternehmen</p>
+          <p className="font-medium text-[var(--md-on-surface)]">{rating.company_name}</p>
+        </div>
+        <div>
+          <p className="text-sm text-[var(--md-on-surface-variant)] mb-1">Bewertet</p>
+          <p className="font-medium text-[var(--md-on-surface)]">{rating.partner_name}</p>
+        </div>
+        <div>
+          <p className="text-sm text-[var(--md-on-surface-variant)] mb-1">Bewertung abgegeben am</p>
+          <p className="font-medium text-[var(--md-on-surface)]">{formatDate(rating.created_at)}</p>
         </div>
       </div>
-    </AppLayout>
+
+      {/* Content Cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Rating */}
+        <div className="md-card md-card--elevated p-6">
+          <h2 className="text-lg font-semibold text-[var(--md-on-surface)] mb-4 flex items-center gap-2">
+            <Star className="w-5 h-5" />
+            Bewertung
+          </h2>
+          <div className="flex items-center gap-1">
+            {renderStars(rating.score)}
+            <span className="ml-2 text-lg font-medium text-[var(--md-on-surface)]">{rating.score}/5</span>
+          </div>
+        </div>
+
+        {/* Comment */}
+        {rating.comment && (
+          <div className="md-card md-card--elevated p-6">
+            <h2 className="text-lg font-semibold text-[var(--md-on-surface)] mb-4 flex items-center gap-2">
+              <MessageSquare className="w-5 h-5" />
+              Kommentar
+            </h2>
+            <p className="text-[var(--md-on-surface)]">{rating.comment}</p>
+          </div>
+        )}
+      </div>
+
+      {/* Actions */}
+      <div className="flex justify-between items-center">
+        <Link
+          href={route('web.user-matches.show', rating.user_match_id)}
+          className="md-button md-button--outlined"
+        >
+          Zurück zum Match
+        </Link>
+      </div>
+    </ModernLayout>
   );
 }

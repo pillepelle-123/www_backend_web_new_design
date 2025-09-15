@@ -79,7 +79,8 @@ class OfferController extends Controller
         $page = $request->input('page', 1);
 
         $query = Offer::query()
-            ->with(['offerer', 'company']);
+            ->with(['offerer', 'company'])
+            ->where('admin_status', 'active');
 
         // Suche (case-insensitive)
         if ($request->has('title') && !empty($request->title)) {
@@ -119,6 +120,7 @@ class OfferController extends Controller
         // Mapping der Frontend-Sortierfelder zu Datenbankfeldern
         $sortFieldMap = [
             'created_at' => 'created_at',
+            'title' => 'title',
             'reward_total_cents' => 'reward_total_cents',
             'reward_offerer_percent' => 'reward_offerer_percent',
             'average_rating' => 'users.average_rating'
@@ -129,11 +131,15 @@ class OfferController extends Controller
 
         // Spezielle Sortierung für Felder aus verknüpften Tabellen
         if ($dbSortField === 'users.average_rating') {
-            $query->join('users', 'offers.offerer_id', '=', 'users.id')
-                  ->select('offers.*');
+            $query->orderBy(
+                \DB::table('users')
+                    ->select('average_rating')
+                    ->whereColumn('users.id', 'offers.offerer_id'),
+                $sortDirection
+            );
+        } else {
+            $query->orderBy($dbSortField, $sortDirection);
         }
-
-        $query->orderBy($dbSortField, $sortDirection);
 
         // Paginierung
         $offers = $query->paginate($perPage, ['*'], 'page', $page);

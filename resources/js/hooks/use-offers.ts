@@ -20,24 +20,25 @@ interface PaginationData {
   total: number;
 }
 
-export const useOffers = () => {
-  const [offers, setOffers] = useState<Offer[]>([]);
-  const [pagination, setPagination] = useState<PaginationData>({
+export const useOffers = (initialOffers?: Offer[], initialPagination?: PaginationData) => {
+  const [offers, setOffers] = useState<Offer[]>(initialOffers || []);
+  const [pagination, setPagination] = useState<PaginationData>(initialPagination || {
     current_page: 1,
     last_page: 1,
     per_page: 20,
     total: 0,
   });
+  const [hasInitialized, setHasInitialized] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Separate Filter-Zustände für verzögerte und sofortige Filter
   const [delayedFilters, setDelayedFilters] = useState<OfferFilters>({
     title: '',
     offer_company: '',
     created_at_from: '',
   });
-  
+
   const [immediateFilters, setImmediateFilters] = useState<OfferFilters>({
     offerer_type: '',
     status: '',
@@ -45,7 +46,7 @@ export const useOffers = () => {
     sort_field: 'created_at',
     sort_direction: 'desc',
   });
-  
+
   // Kombinierter Filter-Zustand für die API-Anfrage
   const [activeFilters, setActiveFilters] = useState<OfferFilters>({
     ...delayedFilters,
@@ -57,10 +58,13 @@ export const useOffers = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Parameter für die Anfrage erstellen
       const params = new URLSearchParams();
       params.append('page', page.toString());
+
+      // Always filter for active offers only
+      params.append('admin_status', 'active');
       
       // Filter hinzufügen
       Object.entries(activeFilters).forEach(([key, value]) => {
@@ -68,15 +72,20 @@ export const useOffers = () => {
           params.append(key, value.toString());
         }
       });
-      
+
       const { data } = await axios.get(`/offers-fetch-more?${params.toString()}`);
-      
+
       if (resetResults) {
         setOffers(data.offers);
       } else {
-        setOffers(prev => [...prev, ...data.offers]);
+        setOffers(prev => {
+          // Filter out any offers that already exist to prevent duplicates
+          const existingIds = new Set(prev.map(offer => offer.id));
+          const newOffers = data.offers.filter(offer => !existingIds.has(offer.id));
+          return [...prev, ...newOffers];
+        });
       }
-      
+
       setPagination(data.pagination);
     } catch (err) {
       setError('Fehler beim Laden der Angebote');
@@ -100,11 +109,11 @@ export const useOffers = () => {
       if ('title' in newFilters) filteredUpdates.title = newFilters.title;
       if ('offer_company' in newFilters) filteredUpdates.offer_company = newFilters.offer_company;
       if ('created_at_from' in newFilters) filteredUpdates.created_at_from = newFilters.created_at_from;
-      
+
       return { ...prev, ...filteredUpdates };
     });
   }, []);
-  
+
   // Funktion zum Aktualisieren der sofortigen Filter (mit sofortiger Anwendung)
   const updateImmediateFilters = useCallback((newFilters: Partial<OfferFilters>) => {
     setImmediateFilters(prev => {
@@ -115,12 +124,12 @@ export const useOffers = () => {
       if ('average_rating_min' in newFilters) filteredUpdates.average_rating_min = newFilters.average_rating_min;
       if ('sort_field' in newFilters) filteredUpdates.sort_field = newFilters.sort_field;
       if ('sort_direction' in newFilters) filteredUpdates.sort_direction = newFilters.sort_direction;
-      
+
       const newState = { ...prev, ...filteredUpdates };
-      
+
       // Sofort aktive Filter aktualisieren
       setActiveFilters(current => ({ ...current, ...filteredUpdates }));
-      
+
       return newState;
     });
   }, []);
@@ -132,7 +141,7 @@ export const useOffers = () => {
     if ('title' in newFilters) delayedUpdates.title = newFilters.title;
     if ('offer_company' in newFilters) delayedUpdates.offer_company = newFilters.offer_company;
     if ('created_at_from' in newFilters) delayedUpdates.created_at_from = newFilters.created_at_from;
-    
+
     // Sofortige Filter
     const immediateUpdates: Partial<OfferFilters> = {};
     if ('offerer_type' in newFilters) immediateUpdates.offerer_type = newFilters.offerer_type;
@@ -140,12 +149,12 @@ export const useOffers = () => {
     if ('average_rating_min' in newFilters) immediateUpdates.average_rating_min = newFilters.average_rating_min;
     if ('sort_field' in newFilters) immediateUpdates.sort_field = newFilters.sort_field;
     if ('sort_direction' in newFilters) immediateUpdates.sort_direction = newFilters.sort_direction;
-    
+
     // Beide Filter-Typen aktualisieren
     if (Object.keys(delayedUpdates).length > 0) {
       setDelayedFilters(prev => ({ ...prev, ...delayedUpdates }));
     }
-    
+
     if (Object.keys(immediateUpdates).length > 0) {
       setImmediateFilters(prev => ({ ...prev, ...immediateUpdates }));
       // Sofortige Filter direkt anwenden
@@ -158,17 +167,29 @@ export const useOffers = () => {
     setActiveFilters(current => ({ ...current, ...delayedFilters }));
   }, [delayedFilters]);
 
-  // Initiales Laden der Angebote
+  // Initiales Laden der Angebote und Filter-Änderungen
   useEffect(() => {
-    fetchOffers(1, true);
-  }, [activeFilters, fetchOffers]);
+    if (!hasInitialized) {
+      // First render: use initial data if available, otherwise fetch
+      if (initialOffers && initialOffers.length > 0) {
+        setHasInitialized(true);
+        return; // Use initial data, don't fetch
+      } else {
+        setHasInitialized(true);
+        fetchOffers(1, true);
+      }
+    } else {
+      // Subsequent renders: always fetch when filters change
+      fetchOffers(1, true);
+    }
+  }, [activeFilters, fetchOffers, initialOffers, hasInitialized]);
 
-  return { 
-    offers, 
-    pagination, 
-    loading, 
-    error, 
-    loadMore, 
+  return {
+    offers,
+    pagination,
+    loading,
+    error,
+    loadMore,
     updateFilters,
     updateDelayedFilters,
     updateImmediateFilters,

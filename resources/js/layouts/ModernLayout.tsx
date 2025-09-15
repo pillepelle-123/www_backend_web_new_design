@@ -10,6 +10,7 @@ interface ModernLayoutProps {
   title?: string;
   breadcrumbs?: BreadcrumbItem[];
   headerRightContent?: React.ReactNode;
+  filterBar?: React.ReactNode;
   showSidebar?: boolean;
   showBottomNavigation?: boolean;
   className?: string;
@@ -20,6 +21,7 @@ export default function ModernLayout({
   title,
   breadcrumbs = [],
   headerRightContent,
+  filterBar,
   showSidebar = true,
   showBottomNavigation = true,
   className = '',
@@ -75,25 +77,40 @@ export default function ModernLayout({
           {/* Breadcrumbs - Hidden on mobile */}
           {breadcrumbs.length > 0 && (
             <div className="hidden lg:block px-4 py-3 bg-[var(--md-surface-container-low)] flex-shrink-0">
-              <nav className="flex items-center space-x-2 text-sm">
-                {breadcrumbs.map((breadcrumb, index) => (
-                  <div key={breadcrumb.href} className="flex items-center">
-                    {index > 0 && (
-                      <span className="text-[var(--md-on-surface-variant)] mx-2">/</span>
-                    )}
-                    <a
-                      href={breadcrumb.href}
-                      className={`${
-                        index === breadcrumbs.length - 1
-                          ? 'text-[var(--md-on-surface)] font-medium'
-                          : 'text-[var(--md-on-surface-variant)] hover:text-[var(--md-primary)]'
-                      } transition-colors`}
-                    >
-                      {breadcrumb.title}
-                    </a>
+              <div className="flex items-center justify-between">
+                <nav className="flex items-center space-x-2 text-sm">
+                  {breadcrumbs.map((breadcrumb, index) => (
+                    <div key={breadcrumb.href} className="flex items-center">
+                      {index > 0 && (
+                        <span className="text-[var(--md-on-surface-variant)] mx-2">/</span>
+                      )}
+                      <a
+                        href={breadcrumb.href}
+                        className={`${
+                          index === breadcrumbs.length - 1
+                            ? 'text-[var(--md-on-surface)] font-medium'
+                            : 'text-[var(--md-on-surface-variant)] hover:text-[var(--md-primary)]'
+                        } transition-colors`}
+                      >
+                        {breadcrumb.title}
+                      </a>
+                    </div>
+                  ))}
+                </nav>
+                {/* Header Right Content */}
+                {headerRightContent && (
+                  <div className="flex items-center">
+                    {headerRightContent}
                   </div>
-                ))}
-              </nav>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Filter Bar */}
+          {filterBar && (
+            <div className="flex-shrink-0">
+              {filterBar}
             </div>
           )}
 

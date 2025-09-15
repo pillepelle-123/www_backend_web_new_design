@@ -103,7 +103,6 @@ export function ModernHeader({
                 className="flex items-center gap-2 p-2 hover:bg-[var(--md-surface-container-high)]"
               >
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="/placeholder-avatar.jpg" alt="User Avatar" />
                   <AvatarFallback>
                     <User className="h-4 w-4" />
                   </AvatarFallback>
