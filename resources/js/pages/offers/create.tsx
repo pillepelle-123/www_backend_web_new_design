@@ -2,8 +2,9 @@ import ModernLayout from '@/layouts/ModernLayout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm, router } from '@inertiajs/react';
 import Select from 'react-select';
-import { useState, /* useEffect */ } from 'react';
-import { ChevronDown, ChevronUp, Building2, Euro, Percent, UserRound, UsersRound, FileText } from 'lucide-react';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { ChevronDown, ChevronUp, Building2, Euro, Percent, UserRound, UsersRound, FileText, Plus } from 'lucide-react';
+import Fuse from 'fuse.js';
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -32,7 +33,11 @@ export default function Create({ companies }: { companies: Company[] }) {
         offerer_type: 'referrer',
     });
 
-    const [selectedCompany, setSelectedCompany] = useState<{ value: string; label: string } | null>(null);
+    const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
+    const [companySearch, setCompanySearch] = useState('');
+    const [showCompanyOverlay, setShowCompanyOverlay] = useState(false);
+    const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
+    const [tempSelectedCompany, setTempSelectedCompany] = useState<Company | null>(null);
     // const [isDark, setIsDark] = useState(false);
 
     { /*
@@ -45,6 +50,23 @@ export default function Create({ companies }: { companies: Company[] }) {
         value: company.id.toString(),
         label: company.name
     }));
+
+    const fuse = useMemo(() => new Fuse(companies, {
+        keys: ['name'],
+        threshold: 0.3,
+        distance: 100,
+        minMatchCharLength: 2,
+        includeScore: true
+    }), [companies]);
+
+    useEffect(() => {
+        if (companySearch.length >= 2) {
+            const results = fuse.search(companySearch);
+            setFilteredCompanies(results.map(result => result.item));
+        } else {
+            setFilteredCompanies([]);
+        }
+    }, [companySearch, fuse]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -260,40 +282,106 @@ export default function Create({ companies }: { companies: Company[] }) {
                             )}
                         </div>
                         <div>
-                            <label htmlFor="company" className="flex gap-1 md-label">
+                            <label className="flex gap-1 md-label">
                                 <Building2 className="w-4 h-4" />
                                 Anbieter
                             </label>
-                            <Select
-                                id="company"
-                                value={selectedCompany}
-                                onChange={(option) => {
-                                    setSelectedCompany(option);
-                                    setData('company_id', option?.value || '');
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setShowCompanyOverlay(true);
+                                    setCompanySearch('');
+                                    setTempSelectedCompany(null);
                                 }}
-                                options={companyOptions}
-                                classNames={selectClassNames}
-                                classNamePrefix="select"
-                                isClearable
-                                required
-                                styles={{
-                                control: (base) => ({
-                                    ...base,
-                                    color: '#000000 !important',
-                                    backgroundColor: 'var(--md-surface-container)',
-                                    //border: '1px solid orange !important',
-                                    borderRadius: 'var(--radius-lg)',
-                                    boxShadow: 'none',
-                                    '&:hover': {
-                                        borderColor: 'var(--md-outline)',
-                                    },
-                                })
-                            }}
-                            />
+                                className="md-input text-left flex items-center justify-between hover:border-[var(--md-outline)] transition-colors"
+                            >
+                                <span className={selectedCompany ? 'text-[var(--md-on-surface)]' : 'text-[var(--md-on-surface-variant)]'}>
+                                    {selectedCompany ? selectedCompany.name : 'Auswählen'}
+                                </span>
+                                <ChevronDown className="w-4 h-4 text-[var(--md-on-surface-variant)]" />
+                            </button>
                             {errors.company_id && (
                                 <p className="mt-1 text-sm text-[var(--md-error)]">{errors.company_id}</p>
                             )}
                         </div>
+
+                        {/* Company Selection Overlay */}
+                        {showCompanyOverlay && (
+                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                                <div className="bg-[var(--md-surface)] rounded-lg shadow-xl w-full max-w-md mx-4 max-h-[80vh] flex flex-col">
+                                    <div className="p-6 border-b border-[var(--md-outline-variant)]">
+                                        <h3 className="text-lg font-semibold text-[var(--md-on-surface)] mb-4">Unternehmen auswählen</h3>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                value={companySearch}
+                                                onChange={(e) => setCompanySearch(e.target.value)}
+                                                className="md-input"
+                                                placeholder="Mindestens 2 Zeichen eingeben..."
+                                                autoFocus
+                                            />
+                                            <button
+                                                type="button"
+                                                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-[var(--md-primary)] text-[var(--md-on-primary)] flex items-center justify-center hover:bg-[var(--md-primary-container)] hover:text-[var(--md-on-primary-container)] transition-colors"
+                                                onClick={() => alert('Unternehmen hinzufügen - Placeholder')}
+                                            >
+                                                <Plus className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div className="flex-1 overflow-y-auto p-4">
+                                        {companySearch.length < 2 ? (
+                                            <div className="text-center text-[var(--md-on-surface-variant)] py-8">
+                                                Geben Sie mindestens 2 Zeichen ein, um zu suchen
+                                            </div>
+                                        ) : filteredCompanies.length > 0 ? (
+                                            <div className="space-y-1">
+                                                {filteredCompanies.map((company) => (
+                                                    <div
+                                                        key={company.id}
+                                                        className={`px-4 py-3 rounded-lg cursor-pointer transition-colors ${
+                                                            tempSelectedCompany?.id === company.id
+                                                                ? 'bg-[var(--md-primary-container)] text-[var(--md-on-primary-container)]'
+                                                                : 'hover:bg-[var(--md-surface-container-high)] text-[var(--md-on-surface)]'
+                                                        }`}
+                                                        onClick={() => setTempSelectedCompany(company)}
+                                                    >
+                                                        {company.name}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="text-center text-[var(--md-on-surface-variant)] py-8">
+                                                Keine Unternehmen gefunden
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="p-6 border-t border-[var(--md-outline-variant)] flex gap-4 justify-end">
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowCompanyOverlay(false)}
+                                            className="md-button md-button--outlined"
+                                        >
+                                            Abbrechen
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                if (tempSelectedCompany) {
+                                                    setSelectedCompany(tempSelectedCompany);
+                                                    setData('company_id', tempSelectedCompany.id.toString());
+                                                }
+                                                setShowCompanyOverlay(false);
+                                            }}
+                                            disabled={!tempSelectedCompany}
+                                            className="md-button md-button--filled disabled:opacity-50"
+                                        >
+                                            Ok
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                         <div>
                             <label htmlFor="reward_total_eur" className="flex gap-1 md-label">
                                 <Euro className="w-4 h-4" />

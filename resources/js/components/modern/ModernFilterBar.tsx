@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { X, Search, Filter, SortAsc, SortDesc } from 'lucide-react';
 import { router } from '@inertiajs/react';
+import Fuse from 'fuse.js';
 
 interface SearchState {
-  title: string;
-  offer_company: string;
+  search: string;
 }
 
 interface FiltersState {
@@ -31,6 +31,7 @@ interface ModernFilterBarProps {
   onApplyFilters: () => void;
   onImmediateFilterChange: () => void;
   onClose?: () => void;
+  offers?: any[];
 }
 
 export function ModernFilterBar({
@@ -44,28 +45,48 @@ export function ModernFilterBar({
   isMobile,
   onApplyFilters,
   onImmediateFilterChange,
-  onClose
+  onClose,
+  offers = []
 }: ModernFilterBarProps) {
   const [localSearch, setLocalSearch] = useState(search);
   const [localFilters, setLocalFilters] = useState(filters);
   const [localSort, setLocalSort] = useState(sort);
 
-  const handleSearchChange = (field: keyof SearchState, value: string) => {
-    const newSearch = { ...localSearch, [field]: value };
+  // Sync localSearch with parent search state
+  useEffect(() => {
+    setLocalSearch(search);
+  }, [search]);
+
+  // Fuse.js setup for fuzzy search
+  const titleFuse = useMemo(() => new Fuse(offers, {
+    keys: ['title'],
+    threshold: 0.4,
+    distance: 100,
+    minMatchCharLength: 2,
+    includeScore: true
+  }), [offers]);
+
+  const companyFuse = useMemo(() => new Fuse(offers, {
+    keys: ['offer_company'],
+    threshold: 0.4,
+    distance: 100,
+    minMatchCharLength: 2,
+    includeScore: true
+  }), [offers]);
+
+  const handleSearchChange = (value: string) => {
+    const newSearch = { search: value };
     setLocalSearch(newSearch);
-    setSearch(newSearch);
   };
 
   const handleFilterChange = (field: keyof FiltersState, value: string | number) => {
     const newFilters = { ...localFilters, [field]: value };
     setLocalFilters(newFilters);
-    setFilters(newFilters);
   };
 
   const handleSortChange = (field: string, direction: string) => {
     const newSort = { field, direction };
     setLocalSort(newSort);
-    setSort(newSort);
   };
 
   const handleApply = () => {
@@ -73,21 +94,52 @@ export function ModernFilterBar({
     setSearch(localSearch);
     setFilters(localFilters);
     setSort(localSort);
-    // Call the parent's apply function
-    onApplyFilters();
+
+    // Navigate with search parameter
+    const params: Record<string, string> = {};
+    if (localSearch.search) params.client_search = localSearch.search;
+    if (localFilters.offerer_type) params.type = localFilters.offerer_type;
+    if (localFilters.status) params.status = localFilters.status;
+    if (localFilters.average_rating_min > 0) params.rating = localFilters.average_rating_min.toString();
+    if (localFilters.created_at_from) params.date_from = localFilters.created_at_from;
+    if (localSort.field !== 'created_at') params.sort = localSort.field;
+    if (localSort.direction !== 'desc') params.order = localSort.direction;
+
+    router.get('/offers', params, {
+      preserveState: true,
+      preserveScroll: true,
+      onStart: () => onApplyFilters(),
+      onFinish: () => {
+        setTimeout(() => {
+          if (isMobile) {
+            onClose?.();
+          }
+        }, 1000);
+      }
+    });
   };
 
   const clearFilters = () => {
-    // Navigate to base URL without any parameters
-    router.get('/offers', {}, {
-      preserveState: false
+    // Navigate to base URL without any parameters but preserve filter bar state
+    const params: Record<string, string> = {};
+    if (show) params.show_filters = '1';
+    
+    router.get('/offers', params, {
+      preserveState: false,
+      onStart: () => onApplyFilters(),
+      onFinish: () => {
+        setTimeout(() => {
+          if (isMobile) {
+            onClose?.();
+          }
+        }, 1500);
+      }
     });
   };
 
   const hasActiveFilters = () => {
     return (
-      localSearch.title ||
-      localSearch.offer_company ||
+      localSearch.search ||
       localFilters.offerer_type ||
       localFilters.status ||
       localFilters.average_rating_min > 0 ||
@@ -127,29 +179,15 @@ export function ModernFilterBar({
               <div className="space-y-3">
                 {/* Search */}
                 <div>
-                  <label className="md-label text-xs">Titel suchen</label>
+                  <label className="md-label text-xs">Suchen in Titel und Unternehmen</label>
                   <div className="md-search-bar">
                     <Search className="md-search-icon" />
                     <input
                       type="text"
-                      value={localSearch.title}
-                      onChange={(e) => handleSearchChange('title', e.target.value)}
+                      value={localSearch.search}
+                      onChange={(e) => handleSearchChange(e.target.value)}
                       className="md-search-input"
-                      placeholder="Angebotstitel suchen..."
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="md-label text-xs">Unternehmen</label>
-                  <div className="md-search-bar">
-                    <Search className="md-search-icon" />
-                    <input
-                      type="text"
-                      value={localSearch.offer_company}
-                      onChange={(e) => handleSearchChange('offer_company', e.target.value)}
-                      className="md-search-input"
-                      placeholder="Unternehmen suchen..."
+                      placeholder="Titel oder Unternehmen suchen..."
                     />
                   </div>
                 </div>
@@ -244,7 +282,7 @@ export function ModernFilterBar({
             {hasActiveFilters() && (
               <button
                 onClick={clearFilters}
-                className="md-button md-button--text w-full text-sm py-1"
+                className="md-button md-button--outlined w-full text-sm py-1"
               >
                 Filter zurücksetzen
               </button>
@@ -270,29 +308,15 @@ export function ModernFilterBar({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
           {/* Search */}
           <div className="space-y-1">
-            <label className="md-label text-xs">Titel suchen</label>
+            <label className="md-label text-xs">Suchen in Titel und Unternehmen</label>
             <div className="md-search-bar">
               <Search className="md-search-icon" />
               <input
                 type="text"
-                value={localSearch.title}
-                onChange={(e) => handleSearchChange('title', e.target.value)}
+                value={localSearch.search}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="md-search-input"
-                placeholder="Angebotstitel..."
-              />
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <label className="md-label text-xs">Unternehmen</label>
-            <div className="md-search-bar">
-              <Search className="md-search-icon" />
-              <input
-                type="text"
-                value={localSearch.offer_company}
-                onChange={(e) => handleSearchChange('offer_company', e.target.value)}
-                className="md-search-input"
-                placeholder="Unternehmen..."
+                placeholder="Titel oder Unternehmen suchen..."
               />
             </div>
           </div>
@@ -366,15 +390,15 @@ export function ModernFilterBar({
               <div className="flex gap-1">
                 <button
                   onClick={() => handleSortChange(localSort.field, 'desc')}
-                  className={`md-button ${localSort.direction === 'desc' ? 'md-button--filled' : 'md-button--outlined'} text-xs py-1 px-2`}
+                  className={`md-button ${localSort.direction === 'desc' ? 'md-button--filled' : 'md-button--outlined'} text-sm `}
                 >
-                  <SortDesc className="w-3 h-3" />
+                  <SortDesc className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => handleSortChange(localSort.field, 'asc')}
-                  className={`md-button ${localSort.direction === 'asc' ? 'md-button--filled' : 'md-button--outlined'} text-xs py-1 px-2`}
+                  className={`md-button ${localSort.direction === 'asc' ? 'md-button--filled' : 'md-button--outlined'} text-sm `}
                 >
-                  <SortAsc className="w-3 h-3" />
+                  <SortAsc className="w-5 h-5" />
                 </button>
               </div>
             </div>
@@ -385,14 +409,14 @@ export function ModernFilterBar({
           {hasActiveFilters() && (
             <button
               onClick={clearFilters}
-              className="md-button md-button--text text-sm"
+              className="md-button md-button--outlined text-sm"
             >
               Zurücksetzen
             </button>
           )}
           <button
             onClick={handleApply}
-            className="md-button md-button--filled text-sm py-1 px-4"
+            className="md-button md-button--filled text-sm"
           >
             Anwenden
           </button>

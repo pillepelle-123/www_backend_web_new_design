@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Bell, User, Sun, Moon, Monitor } from 'lucide-react';
 import { ModernSidebarToggle } from './ModernSidebar';
 import { Button } from '@/components/ui/button';
@@ -20,25 +20,30 @@ export function ModernHeader({
 }: ModernHeaderProps) {
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showSearchButton, setShowSearchButton] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const page = usePage();
 
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
-    setShowSearchButton(value.trim().length > 0);
-  };
-
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      router.get('/offers', { search: searchQuery.trim() });
+    
+    // Auto-navigate to offers page with search when user types more than 3 characters
+    if (value.trim().length > 3) {
+      setIsSearching(true);
+      router.get('/offers', { 
+        client_search: value.trim()
+      }, {
+        preserveState: true,
+        preserveScroll: true,
+        onFinish: () => {
+          setTimeout(() => {
+            setIsSearching(false);
+          }, 1000);
+        }
+      });
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
+
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light';
@@ -78,25 +83,22 @@ export function ModernHeader({
           {/* Search Bar */}
           <div className="hidden md:block">
             <div className="flex items-center gap-2">
-              <div className="md-search-bar w-80">
+              <div className="md-search-bar w-80 relative">
                 <Search className="md-search-icon" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => handleSearchChange(e.target.value)}
-                  onKeyPress={handleKeyPress}
                   className="md-search-input"
-                  placeholder="Angebote durchsuchen..."
+                  placeholder="Angebotstitel durchsuchen..."
                 />
+                {isSearching && (
+                  <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                    <div className="md-spinner w-4 h-4"></div>
+                  </div>
+                )}
               </div>
-              {showSearchButton && (
-                <Button
-                  onClick={handleSearch}
-                  className="md-button md-button--filled"
-                >
-                  Suchen
-                </Button>
-              )}
+
             </div>
           </div>
         </div>
@@ -166,25 +168,22 @@ export function ModernHeader({
       {/* Mobile Search */}
       <div className="md:hidden px-4 pb-3">
         <div className="flex items-center gap-2">
-          <div className="md-search-bar flex-1">
+          <div className="md-search-bar flex-1 relative">
             <Search className="md-search-icon" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
-              onKeyPress={handleKeyPress}
               className="md-search-input"
-              placeholder="Angebote durchsuchen..."
+              placeholder="Angebotstitel durchsuchen..."
             />
+            {isSearching && (
+              <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                <div className="md-spinner w-4 h-4"></div>
+              </div>
+            )}
           </div>
-          {showSearchButton && (
-            <Button
-              onClick={handleSearch}
-              className="md-button md-button--filled"
-            >
-              Suchen
-            </Button>
-          )}
+
         </div>
       </div>
     </header>
