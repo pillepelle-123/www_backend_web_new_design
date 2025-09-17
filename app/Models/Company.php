@@ -34,6 +34,7 @@ class Company extends Model
         'website_url',
         'referral_program_url',
         'logo_url',
+        'logo_path',
         'description',
         'is_active',
         'industry',

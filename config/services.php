@@ -35,4 +35,16 @@ return [
         ],
     ],
 
+    'openai' => [
+        'api_key' => env('OPENAI_API_KEY'),
+    ],
+
+    'serpapi' => [
+        'api_key' => env('SERPAPI_API_KEY'),
+    ],
+
+    'pappers' => [
+        'api_token' => '12968a84ac1ccf9c5e93de516c7e7f3ea7cdaca4d60d1b4d',
+    ],
+
 ];

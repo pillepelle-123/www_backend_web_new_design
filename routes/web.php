@@ -81,6 +81,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/{id}', [\App\Http\Controllers\Web\RatingController::class, 'show'])->name('show');
     });
 
+    // Company creation routes
+    Route::post('/companies/ai-lookup', [\App\Http\Controllers\Api\V1\CompanyAiController::class, 'aiLookup'])->name('companies.ai-lookup');
+    Route::post('/companies', [\App\Http\Controllers\Api\V1\CompanyAiController::class, 'store'])->name('companies.store');
+
     // API Routes
     Route::get('/offers-fetch-more', [ApiOfferController::class, 'fetchMore'])->name('api.v1.offers.fetch-more');
 });
